@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ltm workspace</title>
+    <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a href="#" class="navbar-brand">ltm workspace</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active"><a href="/" class="nav-link">Home</a></li>
+            
+            
+
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Party</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="/party/add" class="dropdown-item navigator">Add</a>
+                    <a href="/party" class="dropdown-item navigator">List</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Payments</a>            
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="/payments/add" class="dropdown-item navigator">Add</a>
+                    <a href="/payments" class="dropdown-item navigator">List</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Stock</a>            
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="/stock/add" class="dropdown-item navigator">Add</a>
+                    <a href="/stock" class="dropdown-item navigator">List</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+<br>
+<div class="container" id="app"></div>
+
+
+<!-- error templates -->
+<script id="error_template" type="text/x-handlebars-template">
+
+    <div class="ui {{color}} inverted segment" style="height: 250px;">
+        <br>
+        <h2 class="ui center aligned icon header">
+            <i class="exclamation triangle icon"></i>
+            <div class="content">
+                {{title}}
+                <div class="sub-header">{{message}}</div>
+            </div>
+        </h2>
+    </div>
+</script>
+<!-- /error templates -->
+
+<!-- home template -->
+<script id="home_template" type="text/x-handlebars-template">
+    <h1>welcome to ltm workspace</h1>
+</script>
+<!-- /home template -->
+
+<!-- party templates -->
+<script id="party_template" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Party</li>
+        </ol>
+    </nav>
+    <div>
+        <h1>Party</h1>
+    </div>
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Party Name</th>
+                <th scope="col">City</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Email</th>
+            </tr>
+        </thead>
+        <tbody id="party-table_body"></tbody>
+    </table>    
+</script>
+<script id="template-party_add" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item"><a href="/party" class="navigator">Party</a> </li>
+            <li class="breadcrumb-item active" aria-current="page">Add<li>
+        </ol>
+    </nav>
+    <h1>Add Party</h1>
+    <br>
+    <form id="form-party">
+        <div class="form-group">
+            <label for="party-name">Party Name</label>
+            <input type="text" class="form-control" id="party-name">
+        </div>
+        <div class="form-group">
+            <label for="party-contact">Contact Name</label>
+            <input type="text" class="form-control" id="party-contact">
+        </div>
+        <div class="form-group">
+            <label for="party-phone">Phone</label>
+            <input type="text" class="form-control" id="party-phone">
+        </div>
+        <div class="form-group">
+            <label for="party-whatsapp">Whatsapp</label>
+            <input type="text" class="form-control" id="party-whatsapp">
+        </div>
+        <div class="form-group">
+            <label for="party-email">email</label>
+            <input type="text" class="form-control" id="party-email">
+        </div>
+        <div class="form-group">
+            <label for="party-address">Street Address</label>
+            <input type="text" class="form-control" id="party-address">
+        </div>
+        <div class="form-group">
+            <label for="party-city">City</label>
+            <input type="text" class="form-control" id="party-city">
+        </div>
+        <div class="form-group">
+            <label for="party-district">District</label>
+            <input type="text" class="form-control" id="party-district">
+        </div>
+        <div class="form-group">
+            <label for="party-state">State</label>
+            <input type="text" class="form-control" id="party-state">
+        </div>
+        <div class="form-group">
+            <label for="party-pincode">Pincode</label>
+            <input type="text" class="form-control" id="party-pincode">
+        </div>
+    </form>
+    <button class="btn btn-success" id="btn-party_add">Save</button>
+    <br><br>
+    <div class="alert alert-success alert-dismissible fade show invisible" role="alert" id="alert-party_save">
+        <span>Party Added</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</script>
+<!-- /party templates -->
+
+<!-- payments templates -->
+<script id="payments_template" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Payments</li>
+        </ol>
+    </nav>
+    <div>
+        <h1>Payments</h1>
+    </div>
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Party Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Created AT</th>
+            </tr>
+        </thead>
+        <tbody id="payment-table_body"></tbody>
+    </table>    
+</script>
+
+<script id="payments-add_template" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item"><a href="/payments" class="navigator">Payments</a> </li>
+            <li class="breadcrumb-item active" aria-current="page">Add</li>
+        </ol>
+    </nav>
+    <div class="alert alert-success alert-dismissible fade show invisible" role="alert" id="payment-save_alert">
+        <span>Payments Added</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <h1>Add Payment</h1>
+    <form id="payment-form">
+        <div class="form-group">
+            <label for="payment-party">Party Name</label>
+            <input type="text" class="form-control" id="payment-party">
+        </div>
+        <div class="form-group">
+            <label for="payment-mode">Payment Mode</label>
+            <input type="text" class="form-control" id="payment-mode">
+        </div>
+        <div class="form-group">
+            <label for="payment-amount">Amount</label>
+            <input type="number" class="form-control" id="payment-amount">
+        </div>
+        <div class="form-group">
+            <label for="payment-notes">Notes</label>
+            <input type="text" class="form-control" id="payment-notes">
+        </div>
+    </form>
+    <button class="btn btn-success" id="btn-payment_add">Save</button>
+</script>
+<!-- /payments templates -->
+
+<!-- stock templates -->
+<script id="stock_template" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Stock</li>
+        </ol>
+    </nav>
+    <div>
+        <h1>Stock</h1>
+    </div>
+    <table class="table">
+        <thead class="thead-light sticky-top">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Item Name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+                <th scope="col">Discount</th>
+                <th scope="col">Tax Rate(%)</th>
+                <th scope="col">Created At</th>
+            </tr>
+        </thead>
+        <tbody id="stock-table_body"></tbody>
+    </table>
+</script>
+
+<script id="stock-add_template" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item"><a href="/stock" class="navigator">Stock</a> </li>
+            <li class="breadcrumb-item active" aria-current="page">Add</li>
+        </ol>
+    </nav>
+    <div class="alert alert-success alert-dismissible fade show invisible" role="alert" id="stock-save_alert">
+        <span>Stock Saved</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <h1>Add Stock</h1>
+    <form id="stock-form">
+        <div class="form-group">
+            <label for="item-name">Item Name</label>
+            <input type="text" class="form-control" id="item-name">
+        </div>
+        <div class="form-group">
+            <label for="item-quantity">Quantity</label>
+            <input type="number" class="form-control" id='item-quantity'>
+        </div>
+        <div class="form-group">
+            <label for="item-price">Price</label>
+            <input type="number" step="0.01" class="form-control" id="item-price">
+        </div>
+        <div class="form-group">
+            <label for="item-discount">Discount</label>
+            <input type="number" step="0.01" class="form-control" id="item-discount">
+        </div>
+        <div class="form-group">
+            <label for="item-tax">Tax Rate (%)</label>
+            <input type="number" step="0.01" class="form-control" id="item-tax">
+        </div>        
+    </form>
+    <button class="btn btn-success" id="btn-stock_add">Add Stock</button>
+</script>
+<!-- /stock templates-->
+
+
+<script src="/bower_components/jquery/dist/jquery.slim.min.js"></script>
+<script src="/bower_components/popper.js/dist/umd/popper.min.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/bower_components/handlebars/handlebars.min.js"></script>
+<script src="/bower_components/vanilla-router/dist/vanilla-router.min.js"></script>
+<script src="/bower_components/pouchdb/dist/pouchdb.min.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/db.js"></script>
+</body>
+</html>
