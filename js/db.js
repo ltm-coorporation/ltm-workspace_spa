@@ -57,6 +57,59 @@ function addEventHandlers(toggleNavbar = true){
     })
 }
 
+
+// common functions 
+function alertDocSave(modal){
+    var prefix = modal.constructor.name.toLowerCase();
+    document.getElementById(`form-${prefix}`).reset();
+    var alertbox = document.getElementById(`alert-${prefix}_save`);
+    alertbox.classList.remove('invisible');
+    setTimeout(() => {
+        alertbox.classList.add('invisible');
+    }, 3000);
+}
+
+function drawTable(rows, modal, fields){
+    let prefix = modal.constructor.name.toLowerCase();
+    var tbody = document.getElementById(`${prefix}-table_body`);
+    
+    tbody.innerHTML = '';
+
+    rows.forEach((docBody, index) => {
+        tbody.appendChild(tableRowBuilder(docBody.doc, fields, index+1));
+    });
+}
+
+function tableRowBuilder(rowDataObj, rowFields, index){
+    var tr = document.createElement('tr');
+    var th = document.createElement('th');
+    var td = document.createElement('td');
+
+    th.setAttribute('scope', 'row');
+    th.innerHTML = index;
+    tr.appendChild(th.cloneNode(true));
+
+    rowFields.forEach(function(key){
+        if(rowDataObj.hasOwnProperty(key)){
+            td.innerHTML = (key == 'created_at')? (new Date(rowDataObj[key])).toLocaleDateString() : rowDataObj[key];
+            tr.appendChild(td.cloneNode(true));
+        }
+    })
+
+    return tr;
+}
+
+function fetchDataFromHTML(modal){
+    var doc = {};
+    var prefix = modal.constructor.name.toLowerCase() + '-';
+
+    document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
+        let field = (element.id).replace(prefix, '');
+        doc[field] = document.getElementById(element.id).value;
+    });
+
+    return doc;
+}
 class docDB {
 
     constructor(){
@@ -70,7 +123,7 @@ class docDB {
         Object.assign(this.docBody, docToSave)
         this.docBody._id = new Date().toISOString();
         
-        let db = new PouchDB('uuid');
+        let db = new PouchDB(uuid);
 
         return new Promise((resolve, reject) => {
             db.put(this.docBody, (err, result) => {                
@@ -83,6 +136,8 @@ class docDB {
         });
     }
 }
+
+// /common functions
 
 // party functions
 class Party extends docDB{
@@ -102,7 +157,6 @@ class Party extends docDB{
         this.body.district = '';
         this.body.state = '';
         this.body.pincode = '';
-        // this.body.created_at = '';
     }
 
     save(partyDoc){
@@ -141,163 +195,180 @@ function showPartyList(){
         console.log(docs);
         drawTable(docs.rows, modal, partyTableFields);
     });
-
 }
 
-function alertDocSave(modal){
-    var prefix = modal.constructor.name.toLowerCase();
-    document.getElementById(`form-${prefix}`).reset();
-    var alertbox = document.getElementById(`alert-${prefix}_save`);
-    alertbox.classList.remove('invisible');
-    setTimeout(() => {
-        alertbox.classList.add('invisible');
-    }, 3000);
-}
 
-function drawTable(rows, modal, fields){
-    let prefix = modal.constructor.name.toLowerCase();
-    var tbody = document.getElementById(`${prefix}-table_body`);
-    
-    tbody.innerHTML = '';
-
-    rows.forEach((docBody, index) => {
-        tbody.appendChild(tableRowBuilder(docBody.doc, fields, index+1));
-    });
-}
-
-function fetchDataFromHTML(modal){
-    var doc = {};
-    var prefix = modal.constructor.name.toLowerCase() + '-';
-
-    document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
-        let field = (element.id).replace(prefix, '');
-        doc[field] = document.getElementById(element.id).value;
-    });
-
-    return doc;
-}
 
 // /party functions
 
 // payments functions
 
-// class Payments exten
-function savePayment() {
+class Payment extends docDB{
 
-    db = new PouchDB('payments');
-
-    var paymentDoc = {
-        _id: new Date().toISOString(),
-        party: document.getElementById('payment-party').value,
-        mode: document.getElementById('payment-mode').value,
-        amount: document.getElementById('payment-amount').value,
-        notes: document.getElementById('payment-notes').value,
-        created_at: (new Date()).getTime()
+    constructor(){
+        super();
+        this.body = {};
+        this.body._id = '';
+        this.body._rev = '';
+        this.body.party = '';
+        this.body.mode = '';
+        this.body.amount = '';
+        this.body.notes = '';
     }
 
-    db.put(paymentDoc, function(err, result) {
-        if(!err) {
-            document.getElementById('payment-form').reset();
-            var alertbox = document.getElementById('payment-save_alert');
-            alertbox.classList.remove('invisible');
-            setTimeout(() => {
-                alertbox.classList.add('invisible');
-            }, 3000);
-        } else {
-            console.log(err);
-        }
-    });
+    save(paymentDoc){
+        Object.assign(this.body, paymentDoc);
+        return super.save(this.body).then((res) => {
+                    this.body._id = res._id;
+                    this.body._rev = res.rev;    
+                });
+    }
+}
+function savePayment() {
+
+    var payment = new Payment();
+
+    payment.save(fetchDataFromHTML(payment))
+    .then((res) => {
+        alertDocSave(payment);
+    })
+    .catch(err => console.log(err));
+    // db = new PouchDB('payments');
+
+    // var paymentDoc = {
+    //     _id: new Date().toISOString(),
+    //     party: document.getElementById('payment-party').value,
+    //     mode: document.getElementById('payment-mode').value,
+    //     amount: document.getElementById('payment-amount').value,
+    //     notes: document.getElementById('payment-notes').value,
+    //     created_at: (new Date()).getTime()
+    // }
+
+    // db.put(paymentDoc, function(err, result) {
+    //     if(!err) {
+    //         document.getElementById('payment-form').reset();
+    //         var alertbox = document.getElementById('payment-save_alert');
+    //         alertbox.classList.remove('invisible');
+    //         setTimeout(() => {
+    //             alertbox.classList.add('invisible');
+    //         }, 3000);
+    //     } else {
+    //         console.log(err);
+    //     }
+    // });
 }
 
 function showPaymentList(){
-    db = new PouchDB('payments');
+    
+    var modal = new Payment();
+
+    db = new PouchDB(uuid);
 
     db.allDocs({
         include_docs: true,
         descending: true
     }, function(err, docs) {
-        drawPaymentListTable(docs.rows);
+        drawTable(docs.rows, modal, paymentTableFields);
     });
 }
 
-function drawPaymentListTable(rows){
-    var tBody = document.getElementById('payment-table_body');
+// function drawPaymentListTable(rows){
+//     var tBody = document.getElementById('payment-table_body');
 
-    tBody.innerHTML = '';
+//     tBody.innerHTML = '';
 
-    rows.forEach(function(paymentDoc, index){
-        tBody.appendChild(tableRowBuilder(paymentDoc.doc, paymentTableFields, index+1));
-    });
-}
+//     rows.forEach(function(paymentDoc, index){
+//         tBody.appendChild(tableRowBuilder(paymentDoc.doc, paymentTableFields, index+1));
+//     });
+// }
 
 // stock functions
 
+class Stock extends docDB{
+
+    constructor(){
+        super();
+        this.body = {};
+        this.body._id = '';
+        this.body._rev = '';
+        this.body.name = '';
+        this.body.quantity = '';
+        this.body.price = '';
+        this.body.discount = '';
+        this.body.tax = '';
+    }
+
+    save(stockDoc){
+        console.log(stockDoc);
+        Object.assign(this.body, stockDoc);
+        return super.save(this.body).then((res) => {
+                    this.body._id = res.id;
+                    this.body._rev = res.rev;
+                    return this;
+                });
+    }
+}
+
 function saveStock(){
 
-    db = new PouchDB('stock');
-    var itemDoc = {
-        _id: new Date().toISOString(),
-        name: document.getElementById('item-name').value,
-        quantity: document.getElementById('item-quantity').value,
-        price: document.getElementById('item-price').value,
-        
-        discount: document.getElementById('item-discount').value,
-        tax: document.getElementById('item-tax').value,
-        created_at: (new Date()).getTime()
-    };
+    let stock = new Stock();
 
-    db.put(itemDoc, function(err, result) {
-        if(!err) {
-            document.getElementById('stock-form').reset();
-            var alertbox = document.getElementById('stock-save_alert');
-            alertbox.classList.remove('invisible');
-            setTimeout(() => {
-                alertbox.classList.add('invisible');
-            }, 3000);
-        } else {
-            console.log(err);
-        }
-    });
+    stock.save(fetchDataFromHTML(stock))
+    .then((res) => {
+        alertDocSave(stock);
+    })
+    .catch(err => console.log(err));
+
+    // db = new PouchDB('stock');
+    // var itemDoc = {
+    //     _id: new Date().toISOString(),
+    //     name: document.getElementById('item-name').value,
+    //     quantity: document.getElementById('item-quantity').value,
+    //     price: document.getElementById('item-price').value,
+        
+    //     discount: document.getElementById('item-discount').value,
+    //     tax: document.getElementById('item-tax').value,
+    //     created_at: (new Date()).getTime()
+    // };
+
+    // db.put(itemDoc, function(err, result) {
+    //     if(!err) {
+    //         document.getElementById('stock-form').reset();
+    //         var alertbox = document.getElementById('stock-save_alert');
+    //         alertbox.classList.remove('invisible');
+    //         setTimeout(() => {
+    //             alertbox.classList.add('invisible');
+    //         }, 3000);
+    //     } else {
+    //         console.log(err);
+    //     }
+    // });
 }
 
 function showStockList(){
 
-    db = new PouchDB('stock');
+    let modal = new Stock();
+
+    db = new PouchDB(uuid);
+
     db.allDocs({
         include_docs: true,
         descending: true,
     }, function(err, docs) {
         // console.log(docs);
-        drawStockListTable(docs.rows);
+        // drawStockListTable(docs.rows);
+        drawTable(docs.rows, modal, stockTableFields);
     });
 }
 
-function drawStockListTable(rows){
-    var tBody = document.getElementById('stock-table_body');
+// function drawStockListTable(rows){
+//     var tBody = document.getElementById('stock-table_body');
     
 
-    tBody.innerHTML = '';
-    // console.log(rows);
-    rows.forEach(function(stockDoc, index){
-        tBody.appendChild(tableRowBuilder(stockDoc.doc, stockTableFields, index+1));
-    });
-}
+//     tBody.innerHTML = '';
+//     // console.log(rows);
+//     rows.forEach(function(stockDoc, index){
+//         tBody.appendChild(tableRowBuilder(stockDoc.doc, stockTableFields, index+1));
+//     });
+// }
 
-function tableRowBuilder(rowDataObj, rowFields, index){
-    var tr = document.createElement('tr');
-    var th = document.createElement('th');
-    var td = document.createElement('td');
-
-    th.setAttribute('scope', 'row');
-    th.innerHTML = index;
-    tr.appendChild(th.cloneNode(true));
-
-    rowFields.forEach(function(key){
-        if(rowDataObj.hasOwnProperty(key)){
-            td.innerHTML = (key == 'created_at')? (new Date(rowDataObj[key])).toLocaleDateString() : rowDataObj[key];
-            tr.appendChild(td.cloneNode(true));
-        }
-    })
-
-    return tr;
-}

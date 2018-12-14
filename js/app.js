@@ -12,19 +12,19 @@ window.addEventListener('load', () => {
     
 
     // home template
-    const homeTemplate = Handlebars.compile($('#home_template').html());
+    const homeTemplate = Handlebars.compile($('#template-home').html());
 
     //party templates
-    const partyTemplate = Handlebars.compile($('#party_template').html());
+    const partyTemplate = Handlebars.compile($('#template-party').html());
     const partyAddTemplate = Handlebars.compile($('#template-party_add').html());
     
     //payments templates
-    const paymentsTemplate = Handlebars.compile($('#payments_template').html());
-    const paymentsAddTemplae = Handlebars.compile($('#payments-add_template').html());
+    const paymentsTemplate = Handlebars.compile($('#template-payments').html());
+    const paymentsAddTemplae = Handlebars.compile($('#template-payments_add').html());
 
     //stock templates
-    const stockTemplate = Handlebars.compile($('#stock_template').html());
-    const stockAddTemplate = Handlebars.compile($('#stock-add_template').html());
+    const stockTemplate = Handlebars.compile($('#template-stock').html());
+    const stockAddTemplate = Handlebars.compile($('#template-stock_add').html());
 
     const router = new Router({
         mode: 'history',
