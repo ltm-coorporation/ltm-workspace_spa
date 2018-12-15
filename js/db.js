@@ -1,13 +1,21 @@
-var db;
-var remoteCouch = false;
 
 var uuid = 'uuid';
+var db = new PouchDB(uuid);
+var remoteCouch = `http://localhost:5984/${uuid}`;
+
+db.changes({
+    since:'now',
+    live: true
+});
+
 var paymentTableFields = ['party', 'mode', 'amount', 'created_at'];
 var stockTableFields = ['name', 'quantity', 'price', 'discount', 'tax', 'created_at'];
 var partyTableFields = ['name', 'city', 'phone', 'email'];
 
 window.addEventListener('load', () =>  {
-    
+
+    db.replicate.to(remoteCouch);
+    db.replicate.from(remoteCouch);
     addEventHandlers(false);
     var targetNode = document.getElementById('app');
     var config = { childList: true };    
@@ -59,9 +67,9 @@ function addEventHandlers(toggleNavbar = true){
 
 
 // common functions 
-function alertDocSave(modal){
+function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
-    document.getElementById(`form-${prefix}`).reset();
+    // document.getElementById(`form-${prefix}`).reset();
     var alertbox = document.getElementById(`alert-${prefix}_save`);
     alertbox.classList.remove('invisible');
     setTimeout(() => {
@@ -84,6 +92,7 @@ function tableRowBuilder(rowDataObj, rowFields, index){
     var tr = document.createElement('tr');
     var th = document.createElement('th');
     var td = document.createElement('td');
+    var btn = document.createElement('button');
 
     th.setAttribute('scope', 'row');
     th.innerHTML = index;
@@ -94,9 +103,20 @@ function tableRowBuilder(rowDataObj, rowFields, index){
             td.innerHTML = (key == 'created_at')? (new Date(rowDataObj[key])).toLocaleDateString() : rowDataObj[key];
             tr.appendChild(td.cloneNode(true));
         }
-    })
+    });
 
+    // btn.addEventListener('click', () => {
+    //     console.log('clicked');
+    //     printToConsole(rowDataObj);
+    // });
+    // btn.innerHTML = 'Edit';
+    // // td = btn;
+    // tr.appendChild(btn);
     return tr;
+}
+
+function printToConsole(doc){
+    console.log(doc);
 }
 
 function fetchDataFromHTML(modal){
@@ -121,7 +141,8 @@ class docDB {
     save(docToSave){
         
         Object.assign(this.docBody, docToSave)
-        this.docBody._id = new Date().toISOString();
+        // this.docBody._id = new Date().toISOString();
+        this.docBody._id = this.create_UUID();
         
         let db = new PouchDB(uuid);
 
@@ -135,6 +156,18 @@ class docDB {
             });
         });
     }
+
+    create_UUID(){
+        var dt = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (dt + Math.random()*16)%16 | 0;
+            dt = Math.floor(dt/16);
+            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+        });
+        return uuid;
+    }    
+    
+    
 }
 
 // /common functions
@@ -171,15 +204,17 @@ class Party extends docDB{
 
 
 function saveParty(){
-
     var party = new Party();
 
-    party.save(fetchDataFromHTML(party))
-    .then((res) => {
-        console.log(res.body);
-        alertDocSave(party);
-    })
-    .catch(err => console.log(err));
+    for(var i = 0; i<5000; i++){
+        console.log(i);
+        party.save(fetchDataFromHTML(party))
+        .then((res) => {
+            console.log(res.body);
+            alertDocSave(party);
+        })
+        .catch(err => console.log(err));
+    }
 }
 
 
