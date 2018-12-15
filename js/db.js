@@ -69,7 +69,7 @@ function addEventHandlers(toggleNavbar = true){
 // common functions 
 function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
-    // document.getElementById(`form-${prefix}`).reset();
+    document.getElementById(`form-${prefix}`).reset();
     var alertbox = document.getElementById(`alert-${prefix}_save`);
     alertbox.classList.remove('invisible');
     setTimeout(() => {
@@ -104,19 +104,7 @@ function tableRowBuilder(rowDataObj, rowFields, index){
             tr.appendChild(td.cloneNode(true));
         }
     });
-
-    // btn.addEventListener('click', () => {
-    //     console.log('clicked');
-    //     printToConsole(rowDataObj);
-    // });
-    // btn.innerHTML = 'Edit';
-    // // td = btn;
-    // tr.appendChild(btn);
     return tr;
-}
-
-function printToConsole(doc){
-    console.log(doc);
 }
 
 function fetchDataFromHTML(modal){
@@ -206,17 +194,13 @@ class Party extends docDB{
 function saveParty(){
     var party = new Party();
 
-    for(var i = 0; i<5000; i++){
-        console.log(i);
-        party.save(fetchDataFromHTML(party))
-        .then((res) => {
-            console.log(res.body);
-            alertDocSave(party);
-        })
-        .catch(err => console.log(err));
-    }
+    party.save(fetchDataFromHTML(party))
+    .then((res) => {
+        console.log(res.body);
+        alertDocSave(party);
+    })
+    .catch(err => console.log(err));    
 }
-
 
 function showPartyList(){
     let modal = new Party();
@@ -227,17 +211,12 @@ function showPartyList(){
         include_docs: true,
         descending: true
     }, (err, docs) => {
-        console.log(docs);
         drawTable(docs.rows, modal, partyTableFields);
     });
 }
-
-
-
 // /party functions
 
 // payments functions
-
 class Payment extends docDB{
 
     constructor(){
@@ -268,29 +247,6 @@ function savePayment() {
         alertDocSave(payment);
     })
     .catch(err => console.log(err));
-    // db = new PouchDB('payments');
-
-    // var paymentDoc = {
-    //     _id: new Date().toISOString(),
-    //     party: document.getElementById('payment-party').value,
-    //     mode: document.getElementById('payment-mode').value,
-    //     amount: document.getElementById('payment-amount').value,
-    //     notes: document.getElementById('payment-notes').value,
-    //     created_at: (new Date()).getTime()
-    // }
-
-    // db.put(paymentDoc, function(err, result) {
-    //     if(!err) {
-    //         document.getElementById('payment-form').reset();
-    //         var alertbox = document.getElementById('payment-save_alert');
-    //         alertbox.classList.remove('invisible');
-    //         setTimeout(() => {
-    //             alertbox.classList.add('invisible');
-    //         }, 3000);
-    //     } else {
-    //         console.log(err);
-    //     }
-    // });
 }
 
 function showPaymentList(){
@@ -307,18 +263,9 @@ function showPaymentList(){
     });
 }
 
-// function drawPaymentListTable(rows){
-//     var tBody = document.getElementById('payment-table_body');
-
-//     tBody.innerHTML = '';
-
-//     rows.forEach(function(paymentDoc, index){
-//         tBody.appendChild(tableRowBuilder(paymentDoc.doc, paymentTableFields, index+1));
-//     });
-// }
+// /payment functions
 
 // stock functions
-
 class Stock extends docDB{
 
     constructor(){
@@ -353,31 +300,6 @@ function saveStock(){
         alertDocSave(stock);
     })
     .catch(err => console.log(err));
-
-    // db = new PouchDB('stock');
-    // var itemDoc = {
-    //     _id: new Date().toISOString(),
-    //     name: document.getElementById('item-name').value,
-    //     quantity: document.getElementById('item-quantity').value,
-    //     price: document.getElementById('item-price').value,
-        
-    //     discount: document.getElementById('item-discount').value,
-    //     tax: document.getElementById('item-tax').value,
-    //     created_at: (new Date()).getTime()
-    // };
-
-    // db.put(itemDoc, function(err, result) {
-    //     if(!err) {
-    //         document.getElementById('stock-form').reset();
-    //         var alertbox = document.getElementById('stock-save_alert');
-    //         alertbox.classList.remove('invisible');
-    //         setTimeout(() => {
-    //             alertbox.classList.add('invisible');
-    //         }, 3000);
-    //     } else {
-    //         console.log(err);
-    //     }
-    // });
 }
 
 function showStockList(){
@@ -390,20 +312,7 @@ function showStockList(){
         include_docs: true,
         descending: true,
     }, function(err, docs) {
-        // console.log(docs);
-        // drawStockListTable(docs.rows);
         drawTable(docs.rows, modal, stockTableFields);
     });
 }
-
-// function drawStockListTable(rows){
-//     var tBody = document.getElementById('stock-table_body');
-    
-
-//     tBody.innerHTML = '';
-//     // console.log(rows);
-//     rows.forEach(function(stockDoc, index){
-//         tBody.appendChild(tableRowBuilder(stockDoc.doc, stockTableFields, index+1));
-//     });
-// }
-
+// /stock functions
