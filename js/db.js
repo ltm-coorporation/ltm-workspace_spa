@@ -65,7 +65,6 @@ function addEventHandlers(toggleNavbar = true){
     })
 }
 
-
 // common functions 
 function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
@@ -157,7 +156,6 @@ class docDB {
     
     
 }
-
 // /common functions
 
 // party functions
