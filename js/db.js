@@ -8,9 +8,16 @@ db.changes({
     live: true
 });
 
-var paymentTableFields = ['party', 'mode', 'amount', 'created_at'];
-var stockTableFields = ['name', 'quantity', 'price', 'discount', 'tax', 'created_at'];
-var partyTableFields = ['name', 'city', 'phone', 'email'];
+db.createIndex({
+    index: {
+        fields: ['type']
+    }
+});
+// .then((result) => console.log(result));
+
+// var paymentTableFields = ['party', 'mode', 'amount', 'created_at'];
+// var stockTableFields = ['name', 'quantity', 'price', 'discount', 'tax', 'created_at'];
+// var partyTableFields = ['name', 'city', 'phone', 'email'];
 
 window.addEventListener('load', () =>  {
 
@@ -76,10 +83,11 @@ function alertDocSave(modal){
     }, 3000);
 }
 
-function drawTable(rows, modal, fields){
+function drawTable(rows, modal){
     let prefix = modal.constructor.name.toLowerCase();
-    var tbody = document.getElementById(`${prefix}-table_body`);
-    
+    let tbody = document.getElementById(`${prefix}-table_body`);
+    let fields = modal.tableFields;
+
     tbody.innerHTML = '';
 
     rows.forEach((docBody, index) => {
@@ -117,12 +125,35 @@ function fetchDataFromHTML(modal){
 
     return doc;
 }
+
+function showList(modalName){
+
+    let modal = new classMapping[modalName];
+    
+    modal.allDocs()
+    .then((docs) => {        
+        drawTable(docs, modal);
+    })
+    .catch(err => console.log(err));
+}
 class docDB {
 
     constructor(){
         this.docBody = {};
         this.docBody._id = '';
         this.docBody.type = this.constructor.name.toLowerCase();
+    }
+
+    allDocs(){
+        return new Promise((resolve, reject) => {
+            db.find({
+                selector:{ type: this.docBody.type}
+            }).then((result) => {
+                let docs = [];
+                result.docs.forEach(doc => docs.push({doc}));
+                resolve(docs);
+            }).catch(err => reject(err));
+        });        
     }
 
     save(docToSave){
@@ -138,6 +169,7 @@ class docDB {
                 if(err) return reject(err);
                 
                 //deleting docBody makes it only in parent class.
+                // also improves performance in large object.
                 delete this.docBody;
                 return resolve(result);
             });
@@ -152,9 +184,7 @@ class docDB {
             return (c=='x' ? r :(r&0x3|0x8)).toString(16);
         });
         return uuid;
-    }    
-    
-    
+    }
 }
 // /common functions
 
@@ -176,6 +206,10 @@ class Party extends docDB{
         this.body.district = '';
         this.body.state = '';
         this.body.pincode = '';
+    }
+
+    get tableFields() {
+        return ['name', 'city', 'phone', 'email'];
     }
 
     save(partyDoc){
@@ -200,18 +234,18 @@ function saveParty(){
     .catch(err => console.log(err));    
 }
 
-function showPartyList(){
-    let modal = new Party();
+// function showPartyList(){
+//     let modal = new Party();
 
-    db = new PouchDB(uuid);
+//     db = new PouchDB(uuid);
 
-    db.allDocs({
-        include_docs: true,
-        descending: true
-    }, (err, docs) => {
-        drawTable(docs.rows, modal, partyTableFields);
-    });
-}
+//     db.allDocs({
+//         include_docs: true,
+//         descending: true
+//     }, (err, docs) => {
+//         drawTable(docs.rows, modal, partyTableFields);
+//     });
+// }
 // /party functions
 
 // payments functions
@@ -228,6 +262,10 @@ class Payment extends docDB{
         this.body.notes = '';
     }
 
+    get tableFields(){
+        return ['party', 'mode', 'amount', 'created_at'];
+    }
+
     save(paymentDoc){
         Object.assign(this.body, paymentDoc);
         return super.save(this.body).then((res) => {
@@ -236,6 +274,7 @@ class Payment extends docDB{
                 });
     }
 }
+
 function savePayment() {
 
     var payment = new Payment();
@@ -247,19 +286,19 @@ function savePayment() {
     .catch(err => console.log(err));
 }
 
-function showPaymentList(){
+// function showPaymentList(){
     
-    var modal = new Payment();
+//     var modal = new Payment();
 
-    db = new PouchDB(uuid);
+//     db = new PouchDB(uuid);
 
-    db.allDocs({
-        include_docs: true,
-        descending: true
-    }, function(err, docs) {
-        drawTable(docs.rows, modal, paymentTableFields);
-    });
-}
+//     db.allDocs({
+//         include_docs: true,
+//         descending: true
+//     }, function(err, docs) {
+//         drawTable(docs.rows, modal, paymentTableFields);
+//     });
+// }
 
 // /payment functions
 
@@ -278,6 +317,10 @@ class Stock extends docDB{
         this.body.tax = '';
     }
 
+    get tableFields(){
+        return ['name', 'quantity', 'price', 'discount', 'tax', 'created_at'];
+    }
+
     save(stockDoc){
         console.log(stockDoc);
         Object.assign(this.body, stockDoc);
@@ -288,6 +331,8 @@ class Stock extends docDB{
                 });
     }
 }
+
+const classMapping = { Party, Payment, Stock };
 
 function saveStock(){
 
@@ -300,17 +345,21 @@ function saveStock(){
     .catch(err => console.log(err));
 }
 
-function showStockList(){
+// function showStockList(){
 
-    let modal = new Stock();
+//     let modal = new Stock();
+    
+//     modal.allDocs()
+//     .then((docs) => {        
+//         drawTable(docs, modal);
+//     })
+//     .catch(err => console.log(err));
 
-    db = new PouchDB(uuid);
-
-    db.allDocs({
-        include_docs: true,
-        descending: true,
-    }, function(err, docs) {
-        drawTable(docs.rows, modal, stockTableFields);
-    });
-}
+//     // db.allDocs({
+//     //     include_docs: true,
+//     //     descending: true,
+//     // }, function(err, docs) {
+//     //     drawTable(docs.rows, modal, stockTableFields);
+//     // });
+// }
 // /stock functions

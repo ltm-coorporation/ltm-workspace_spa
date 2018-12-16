@@ -49,7 +49,7 @@ window.addEventListener('load', () => {
     //party routes 
     router.add('/party', () => {
         let html = partyTemplate();
-        showPartyList();
+        showList('Party');
         el.html(html);
     });
 
@@ -61,7 +61,7 @@ window.addEventListener('load', () => {
     //payments routes
     router.add('/payments', () => {
         let html = paymentsTemplate();
-        showPaymentList();
+        showList('Payment');
         el.html(html);
     });
 
@@ -73,7 +73,8 @@ window.addEventListener('load', () => {
     // stock routes
     router.add('/stock', () => {
         let html = stockTemplate();
-        showStockList();
+        showList('Stock');
+        // showStockList();
         el.html(html);
     });
 
