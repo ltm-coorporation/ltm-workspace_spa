@@ -147,7 +147,8 @@ class docDB {
     allDocs(){
         return new Promise((resolve, reject) => {
             db.find({
-                selector:{ type: this.docBody.type}
+                selector:{ type: this.docBody.type},
+                sort: [{'_id': 'desc'}]
             }).then((result) => {
                 let docs = [];
                 result.docs.forEach(doc => docs.push({doc}));
