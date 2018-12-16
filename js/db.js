@@ -3,6 +3,7 @@ var uuid = 'uuid';
 var db = new PouchDB(uuid);
 var remoteCouch = `http://localhost:5984/${uuid}`;
 
+var docToEdit = {};
 db.changes({
     since:'now',
     live: true
@@ -10,9 +11,9 @@ db.changes({
 
 db.createIndex({
     index: {
-        fields: ['type']
+        fields: ['type', '_id']
     }
-});
+})
 // .then((result) => console.log(result));
 
 // var paymentTableFields = ['party', 'mode', 'amount', 'created_at'];
@@ -23,14 +24,14 @@ window.addEventListener('load', () =>  {
 
     db.replicate.to(remoteCouch);
     db.replicate.from(remoteCouch);
-    addEventHandlers(false);
+    appReload(false);
     var targetNode = document.getElementById('app');
     var config = { childList: true };    
 
     
     var callback = function(mutationList, observer){
         for(var mutation of mutationList){
-            if(mutation.type == 'childList') return addEventHandlers();
+            if(mutation.type == 'childList') return appReload();
         }
     };
 
@@ -40,7 +41,7 @@ window.addEventListener('load', () =>  {
 
 });
 
-function addEventHandlers(toggleNavbar = true){
+function appReload(toggleNavbar = true){
 
     // if(toggleNavbar) $('.navbar-toggler').click();
     
@@ -69,7 +70,11 @@ function addEventHandlers(toggleNavbar = true){
     $('#btn-party_add').on('click', (e) => {
         e.preventDefault();
         saveParty();
-    })
+    });
+
+    if(Object.keys(docToEdit).length){
+        editDocument(docToEdit);
+    }
 }
 
 // common functions 
@@ -111,7 +116,42 @@ function tableRowBuilder(rowDataObj, rowFields, index){
             tr.appendChild(td.cloneNode(true));
         }
     });
+
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('class', 'btn btn-primary');
+    btn.innerHTML = 'Edit';
+    btn.addEventListener('click', function(doc){
+        // editDocument(doc);
+        docToEdit = {};
+        docToEdit = doc;
+
+        (new ltm()).navigateTo(`/${doc.type}/edit`)
+    }.bind(this, rowDataObj));
+
+    tr.appendChild(btn);
+
     return tr;
+}
+
+function editDocument(editDoc){    
+
+    let docType = editDoc.type;
+    let modalName = docType.charAt(0).toUpperCase()+ docType.slice(1);
+    // console.log(modalName);
+    let modal = new classMapping[modalName];
+    let prefix = modal.constructor.name.toLowerCase() + '-';
+    
+    modal.get(editDoc._id)
+    .then((doc) => {
+        console.log(doc);
+        document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
+            let field = element.id.replace(`${prefix}`, '');
+            // console.log(document.getElementById(element.id));
+            document.getElementById(element.id).value = doc[field];
+        });
+    });
+
+    this.docToEdit = {};
 }
 
 function fetchDataFromHTML(modal){
@@ -155,6 +195,18 @@ class docDB {
                 resolve(docs);
             }).catch(err => reject(err));
         });        
+    }
+
+    get(docId){
+        return new Promise((resolve, reject) => {
+            db.find({
+                selector: { 
+                    type: this.docBody.type, 
+                    _id: docId}, 
+            })
+            .then(result => resolve(result.docs[0]))
+            .catch(err => reject(err));
+        });
     }
 
     save(docToSave){
@@ -213,8 +265,24 @@ class Party extends docDB{
         return ['name', 'city', 'phone', 'email'];
     }
 
+    get fields(){
+        return [
+                [['name', 'city'], 'text'],
+                ['email', 'email']
+            ];
+    }
+
+    get(docId){
+        // return new Promise((resolve, reject) => {
+                return super.get(docId)
+                    // .then(doc => resolve(doc))
+                    // .catch(err => reject(err));
+            // });
+    }
+
     save(partyDoc){
         Object.assign(this.body, partyDoc);
+        // this.validate(this.body,  this.fields)
         return super.save(this.body).then((res) => { 
                     this.body._id = res.id;
                     this.body._rev = res.rev;

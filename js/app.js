@@ -58,18 +58,27 @@ window.addEventListener('load', () => {
         el.html(html);
     });
 
+    router.add('/party/edit', () => {
+        let html = partyAddTemplate();
+        el.html(html);
+    });
+
     //payments routes
-    router.add('/payments', () => {
+    router.add('/payment', () => {
         let html = paymentsTemplate();
         showList('Payment');
         el.html(html);
     });
 
-    router.add('/payments/add', () => {
+    router.add('/payment/add', () => {
         let html = paymentsAddTemplae();
         el.html(html);
     });
 
+    router.add('/payment/edit', () => {
+        let html = paymentsAddTemplae();
+        el.html(html);
+    });
     // stock routes
     router.add('/stock', () => {
         let html = stockTemplate();
@@ -79,6 +88,11 @@ window.addEventListener('load', () => {
     });
 
     router.add('/stock/add', () => {
+        let html = stockAddTemplate();
+        el.html(html);
+    });
+
+    router.add('/stock/edit', () => {
         let html = stockAddTemplate();
         el.html(html);
     });
