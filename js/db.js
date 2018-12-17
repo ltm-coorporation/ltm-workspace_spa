@@ -22,8 +22,10 @@ db.createIndex({
 
 window.addEventListener('load', () =>  {
 
-    db.replicate.to(remoteCouch);
-    db.replicate.from(remoteCouch);
+    db.replicate.to(remoteCouch)
+        // .on('complete', (result) => console.log(result));
+    db.replicate.from(remoteCouch)
+        // .on('complete', (result) => console.log(result));
     appReload(false);
     var targetNode = document.getElementById('app');
     var config = { childList: true };    
@@ -57,25 +59,31 @@ function appReload(toggleNavbar = true){
         ltmObj.navigateTo(path);
     });
 
+    // document.getElementById('btn-stock_add').addEventListener('click', stockAddClickHandler)
     $('#btn-stock_add').on('click', (e) => {
         e.preventDefault();
-        saveStock();
+        saveDoc('Stock');
     });
 
     $('#btn-payment_add').on('click', (e) => {
         e.preventDefault();
-        savePayment();
+        saveDoc('Payment');
     });
 
     $('#btn-party_add').on('click', (e) => {
         e.preventDefault();
-        saveParty();
+        saveDoc('Party');
     });
 
     if(Object.keys(docToEdit).length){
         editDocument(docToEdit);
     }
 }
+
+// function stockAddClickHandler(e){
+//     e.preventDefault();
+//     saveStock();
+// }
 
 // common functions 
 function alertDocSave(modal){    
@@ -149,9 +157,43 @@ function editDocument(editDoc){
             // console.log(document.getElementById(element.id));
             document.getElementById(element.id).value = doc[field];
         });
-    });
+        return;
+    })
+    .then(() => {
+        // console.log(d);
+        $(`#btn-${docType}_add`).off()
+            .text(`Update ${docType}`)
+            .on('click', (e) => {
+                e.preventDefault();
+                updateDoc(modal, editDoc);
+            });
+        
+    }).catch(err => console.log(err));
 
     this.docToEdit = {};
+}
+
+function updateDoc(modal, editDoc){
+    let doc = fetchDataFromHTML(modal);
+    modal.get(editDoc._id)
+    .then((result) => {
+        doc._id = result._id;
+        doc._rev = result._rev;
+        return modal.save(doc);        
+    })
+    .then((res) => {
+        alertDocSave(modal);
+        let ltmObj = new ltm();
+        ltmObj.navigateTo(editDoc.type);
+    })
+    .catch(err => console.log(err));
+}
+
+function saveDoc(modalName){
+    let modal = new classMapping[modalName];
+    modal.save(fetchDataFromHTML(modal))
+    .then((res) => alertDocSave(modal))
+    .catch(err => console.log(err));
 }
 
 function fetchDataFromHTML(modal){
@@ -213,7 +255,7 @@ class docDB {
         
         Object.assign(this.docBody, docToSave)
         // this.docBody._id = new Date().toISOString();
-        this.docBody._id = this.create_UUID();
+        this.docBody._id = docToSave._id ? docToSave._id :this.create_UUID();
         
         let db = new PouchDB(uuid);
 
@@ -292,16 +334,16 @@ class Party extends docDB{
 }
 
 
-function saveParty(){
-    var party = new Party();
+// function saveParty(){
+//     var party = new Party();
 
-    party.save(fetchDataFromHTML(party))
-    .then((res) => {
-        console.log(res.body);
-        alertDocSave(party);
-    })
-    .catch(err => console.log(err));    
-}
+//     party.save(fetchDataFromHTML(party))
+//     .then((res) => {
+//         // console.log(res.body);
+//         alertDocSave(party);
+//     })
+//     .catch(err => console.log(err));    
+// }
 
 // function showPartyList(){
 //     let modal = new Party();
@@ -344,16 +386,16 @@ class Payment extends docDB{
     }
 }
 
-function savePayment() {
+// function savePayment() {
 
-    var payment = new Payment();
+//     var payment = new Payment();
 
-    payment.save(fetchDataFromHTML(payment))
-    .then((res) => {
-        alertDocSave(payment);
-    })
-    .catch(err => console.log(err));
-}
+//     payment.save(fetchDataFromHTML(payment))
+//     .then((res) => {
+//         alertDocSave(payment);
+//     })
+//     .catch(err => console.log(err));
+// }
 
 // function showPaymentList(){
     
@@ -403,16 +445,16 @@ class Stock extends docDB{
 
 const classMapping = { Party, Payment, Stock };
 
-function saveStock(){
+// function saveStock(){
 
-    let stock = new Stock();
+//     let stock = new Stock();
 
-    stock.save(fetchDataFromHTML(stock))
-    .then((res) => {
-        alertDocSave(stock);
-    })
-    .catch(err => console.log(err));
-}
+//     stock.save(fetchDataFromHTML(stock))
+//     .then((res) => {
+//         alertDocSave(stock);
+//     })
+//     .catch(err => console.log(err));
+// }
 
 // function showStockList(){
 
