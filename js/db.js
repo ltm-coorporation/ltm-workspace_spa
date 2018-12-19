@@ -220,6 +220,10 @@ function showList(modalName){
 
 class Validator{
 
+    is_float(){
+        return (arguments[0].match(/\-?\d+\.\d+$/))? true: false;
+    }
+
     is_number(){
         return (arguments[0].match(/^[0-9]+$/))? true: false;
     }
@@ -257,6 +261,7 @@ class Validator{
                     validDoc[field].value = doc[field];
                     let valuetype = fields[1];
                     validDoc[field].isValid = this[`is_${valuetype}`](doc[field]);
+                    // console.log(this[`is_${valuetype}`](doc[field]));
                     if(!validDoc[field].isValid){
                         validDoc.isValid = false;
                     }
@@ -446,7 +451,8 @@ class Stock extends docDB{
     get fields(){
         return [
             [['name', 'discount'], 'string'],
-            [['quantity','price', 'tax'], 'number']
+            [['quantity'], 'number'],
+            [['price', 'discount', 'tax'], 'number']
 
         ];
     }
