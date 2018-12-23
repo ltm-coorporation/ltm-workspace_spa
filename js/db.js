@@ -1,7 +1,9 @@
 
 var uuid = 'uuid';
 var db = new PouchDB(uuid);
-var remoteCouch = `http://localhost:5984/${uuid}`;
+var remoteCouch = `http://ltm:qwerty@localhost:5984/${uuid}`;
+// var account = 'a9b5854b-543d-4dba-b22d-bd4a899d2dd3-bluemix';
+// var remoteCouch = `https://oughtchaveringstensiling:8eceff51782b5087bcb3d318fd9e1fed4b0fedf6@${account}.cloudant.com/ltm-app`;
 
 var docToEdit = {};
 db.changes({
@@ -15,10 +17,6 @@ db.createIndex({
     }
 })
 // .then((result) => console.log(result));
-
-// var paymentTableFields = ['party', 'mode', 'amount', 'created_at'];
-// var stockTableFields = ['name', 'quantity', 'price', 'discount', 'tax', 'created_at'];
-// var partyTableFields = ['name', 'city', 'phone', 'email'];
 
 window.addEventListener('load', () =>  {
 
@@ -187,6 +185,7 @@ function updateDoc(modal, editDoc){
 
 function saveDoc(modalName){
     let modal = new classMapping[modalName];
+    // let modal = new modalDoc();
     modal.save(fetchDataFromHTML(modal))
     .then((res) => alertDocSave(modal))
     .catch(err => console.log(err));
@@ -349,23 +348,63 @@ class docDB {
     }
 }
 
-class Party extends docDB{
-
+class modalDoc extends docDB {
     constructor(){
         super();
         this.body = {};
         this.body._id = '';
         this.body._rev = '';
-        this.body.name = '';
-        this.body.contact = '';
-        this.body.phone = '';
-        this.body.whatsapp = '';
-        this.body.email = '';
-        this.body.address = '';
-        this.body.city = '';
-        this.body.district = '';
-        this.body.state = '';
-        this.body.pincode = '';
+
+        // from child class
+        this.fields.forEach(function(fieldTypeArray){
+            
+            fieldTypeArray[0].forEach(function(field){
+                
+                this.body[field] = '';
+            }.bind(this));
+        }.bind(this));
+        // console.log(this);
+    }
+
+    get(docId){
+        return super.get(docId);
+    }
+
+    save(docToSave){
+        Object.assign(this.body, docToSave);
+
+        return super.save(this.body)
+                .then((res) => {
+                    this.body._id = res.id;
+                    this.body._rev = res.rev;
+                    return this;
+                });
+    }
+}
+class Party extends modalDoc{
+
+    constructor(){
+        super();
+        // console.log(this);
+        // this.fields.forEach(function(fieldTypeArray){
+            
+        //     fieldTypeArray[0].forEach(function(field){
+                
+        //         this.body[field] = '';
+        //     }.bind(this));
+        // }.bind(this));
+
+        
+        // this.body.name = '';
+        // this.body.contact = '';
+        // this.body.phone = '';
+        // this.body.whatsapp = '';
+        // this.body.email = '';
+        // this.body.address = '';
+        // this.body.city = '';
+        // this.body.district = '';
+        // this.body.state = '';
+        // this.body.pincode = '';
     }
 
     get tableFields() {
@@ -381,32 +420,32 @@ class Party extends docDB{
             ];
     }
 
-    get(docId){
-        return super.get(docId);
-    }
+    // get(docId){
+    //     return super.get(docId);
+    // }
 
-    save(partyDoc){
-        Object.assign(this.body, partyDoc);
-        // this.validate(this.body,  this.fields)
-        return super.save(this.body).then((res) => { 
-                    this.body._id = res.id;
-                    this.body._rev = res.rev;
-                    return this;
-                });
-    }
+    // save(partyDoc){
+    //     Object.assign(this.body, partyDoc);
+    //     // this.validate(this.body,  this.fields)
+    //     return super.save(this.body).then((res) => { 
+    //                 this.body._id = res.id;
+    //                 this.body._rev = res.rev;
+    //                 return this;
+    //             });
+    // }
 }
 
-class Payment extends docDB{
+class Payment extends modalDoc{
 
     constructor(){
         super();
-        this.body = {};
-        this.body._id = '';
-        this.body._rev = '';
-        this.body.party = '';
-        this.body.mode = '';
-        this.body.amount = '';
-        this.body.notes = '';
+        // this.body = {};
+        // this.body._id = '';
+        // this.body._rev = '';
+        // this.body.party = '';
+        // this.body.mode = '';
+        // this.body.amount = '';
+        // this.body.notes = '';
     }
 
     get tableFields(){
@@ -420,28 +459,28 @@ class Payment extends docDB{
         ];
     }
 
-    save(paymentDoc){
-        Object.assign(this.body, paymentDoc);
-        return super.save(this.body).then((res) => {
-                    this.body._id = res._id;
-                    this.body._rev = res.rev; 
-                    return this;   
-                });
-    }
+    // save(paymentDoc){
+    //     Object.assign(this.body, paymentDoc);
+    //     return super.save(this.body).then((res) => {
+    //                 this.body._id = res._id;
+    //                 this.body._rev = res.rev; 
+    //                 return this;   
+    //             });
+    // }
 }
 
-class Stock extends docDB{
+class Stock extends modalDoc{
 
     constructor(){
         super();
-        this.body = {};
-        this.body._id = '';
-        this.body._rev = '';
-        this.body.name = '';
-        this.body.quantity = '';
-        this.body.price = '';
-        this.body.discount = '';
-        this.body.tax = '';
+        // this.body = {};
+        // this.body._id = '';
+        // this.body._rev = '';
+        // this.body.name = '';
+        // this.body.quantity = '';
+        // this.body.price = '';
+        // this.body.discount = '';
+        // this.body.tax = '';
     }
 
     get tableFields(){
@@ -450,22 +489,21 @@ class Stock extends docDB{
 
     get fields(){
         return [
-            [['name', 'discount'], 'string'],
+            [['name', 'discount', 'price'], 'string'],
             [['quantity'], 'number'],
-            [['price', 'discount', 'tax'], 'number']
-
+            [['discount', 'tax'], 'number']
         ];
     }
 
-    save(stockDoc){
-        // console.log(stockDoc);
-        Object.assign(this.body, stockDoc);
-        return super.save(this.body).then((res) => {
-                    this.body._id = res.id;
-                    this.body._rev = res.rev;
-                    return this;
-                });
-    }
+    // save(stockDoc){
+    //     // console.log(stockDoc);
+    //     Object.assign(this.body, stockDoc);
+    //     return super.save(this.body).then((res) => {
+    //                 this.body._id = res.id;
+    //                 this.body._rev = res.rev;
+    //                 return this;
+    //             });
+    // }
 }
 
 const classMapping = { Party, Payment, Stock };
