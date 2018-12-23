@@ -77,11 +77,6 @@ function appReload(toggleNavbar = true){
     }
 }
 
-// function stockAddClickHandler(e){
-//     e.preventDefault();
-//     saveStock();
-// }
-
 // common functions 
 function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
@@ -185,7 +180,6 @@ function updateDoc(modal, editDoc){
 
 function saveDoc(modalName){
     let modal = new classMapping[modalName];
-    // let modal = new modalDoc();
     modal.save(fetchDataFromHTML(modal))
     .then((res) => alertDocSave(modal))
     .catch(err => console.log(err));
@@ -247,20 +241,18 @@ class Validator{
     }
 
     validate(doc, fieldsArray){
-        // console.log(doc);
+        
         let validDoc = {};
         validDoc.isValid = true;
         fieldsArray.forEach(fields => {
-            // console.log(fields);
             fields[0].forEach(field => {
-                // console.log(field)
                 if(doc.hasOwnProperty(field)){
 
                     validDoc[field] = {};
                     validDoc[field].value = doc[field];
                     let valuetype = fields[1];
                     validDoc[field].isValid = this[`is_${valuetype}`](doc[field]);
-                    // console.log(this[`is_${valuetype}`](doc[field]));
+                    
                     if(!validDoc[field].isValid){
                         validDoc.isValid = false;
                     }
@@ -307,7 +299,6 @@ class docDB {
 
     validate(doc){
         let v = new Validator();
-        // console.log(this.feilds);
         return  v.validate(doc, this.fields);
     }
 
@@ -363,7 +354,6 @@ class modalDoc extends docDB {
                 this.body[field] = '';
             }.bind(this));
         }.bind(this));
-        // console.log(this);
     }
 
     get(docId){
@@ -385,26 +375,6 @@ class Party extends modalDoc{
 
     constructor(){
         super();
-        // console.log(this);
-        // this.fields.forEach(function(fieldTypeArray){
-            
-        //     fieldTypeArray[0].forEach(function(field){
-                
-        //         this.body[field] = '';
-        //     }.bind(this));
-        // }.bind(this));
-
-        
-        // this.body.name = '';
-        // this.body.contact = '';
-        // this.body.phone = '';
-        // this.body.whatsapp = '';
-        // this.body.email = '';
-        // this.body.address = '';
-        // this.body.city = '';
-        // this.body.district = '';
-        // this.body.state = '';
-        // this.body.pincode = '';
     }
 
     get tableFields() {
@@ -419,33 +389,12 @@ class Party extends modalDoc{
                 [['phone', 'whatsapp'], 'phone']                
             ];
     }
-
-    // get(docId){
-    //     return super.get(docId);
-    // }
-
-    // save(partyDoc){
-    //     Object.assign(this.body, partyDoc);
-    //     // this.validate(this.body,  this.fields)
-    //     return super.save(this.body).then((res) => { 
-    //                 this.body._id = res.id;
-    //                 this.body._rev = res.rev;
-    //                 return this;
-    //             });
-    // }
 }
 
 class Payment extends modalDoc{
 
     constructor(){
         super();
-        // this.body = {};
-        // this.body._id = '';
-        // this.body._rev = '';
-        // this.body.party = '';
-        // this.body.mode = '';
-        // this.body.amount = '';
-        // this.body.notes = '';
     }
 
     get tableFields(){
@@ -458,29 +407,12 @@ class Payment extends modalDoc{
             [['amount'], 'number']
         ];
     }
-
-    // save(paymentDoc){
-    //     Object.assign(this.body, paymentDoc);
-    //     return super.save(this.body).then((res) => {
-    //                 this.body._id = res._id;
-    //                 this.body._rev = res.rev; 
-    //                 return this;   
-    //             });
-    // }
 }
 
 class Stock extends modalDoc{
 
     constructor(){
         super();
-        // this.body = {};
-        // this.body._id = '';
-        // this.body._rev = '';
-        // this.body.name = '';
-        // this.body.quantity = '';
-        // this.body.price = '';
-        // this.body.discount = '';
-        // this.body.tax = '';
     }
 
     get tableFields(){
@@ -494,16 +426,6 @@ class Stock extends modalDoc{
             [['discount', 'tax'], 'number']
         ];
     }
-
-    // save(stockDoc){
-    //     // console.log(stockDoc);
-    //     Object.assign(this.body, stockDoc);
-    //     return super.save(this.body).then((res) => {
-    //                 this.body._id = res.id;
-    //                 this.body._rev = res.rev;
-    //                 return this;
-    //             });
-    // }
 }
 
 const classMapping = { Party, Payment, Stock };
