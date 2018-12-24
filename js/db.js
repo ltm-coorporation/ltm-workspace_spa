@@ -18,28 +18,28 @@ db.createIndex({
 })
 // .then((result) => console.log(result));
 
-window.addEventListener('load', () =>  {
+// window.addEventListener('load', () =>  {
 
-    db.replicate.to(remoteCouch)
-        // .on('complete', (result) => console.log(result));
-    db.replicate.from(remoteCouch)
-        // .on('complete', (result) => console.log(result));
-    appReload(false);
-    var targetNode = document.getElementById('app');
-    var config = { childList: true };    
+//     db.replicate.to(remoteCouch)
+//         // .on('complete', (result) => console.log(result));
+//     db.replicate.from(remoteCouch)
+//         // .on('complete', (result) => console.log(result));
+//     appReload(false);
+//     var targetNode = document.getElementById('app');
+//     var config = { childList: true };    
 
     
-    var callback = function(mutationList, observer){
-        for(var mutation of mutationList){
-            if(mutation.type == 'childList') return appReload();
-        }
-    };
+//     // var callback = function(mutationList, observer){
+//     //     for(var mutation of mutationList){
+//     //         if(mutation.type == 'childList') return appReload();
+//     //     }
+//     // };
 
-    var observer = new MutationObserver(callback);
+//     // var observer = new MutationObserver(callback);
 
-    observer.observe(targetNode, config);
+//     // observer.observe(targetNode, config);
 
-});
+// });
 
 function appReload(toggleNavbar = true){
 
@@ -57,16 +57,20 @@ function appReload(toggleNavbar = true){
     });
 
     // document.getElementById('btn-stock_add').addEventListener('click', stockAddClickHandler)
+    
+    $(new Form(new Stock()).view()).insertBefore('#btn-stock_add');
     $('#btn-stock_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Stock');
     });
 
+    $(new Form(new Payment()).view()).insertBefore('#btn-payment_add');
     $('#btn-payment_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Payment');
     });
 
+    $(new Form(new Party()).view()).insertBefore('#btn-party_add');
     $('#btn-party_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Party');
@@ -347,13 +351,28 @@ class modalDoc extends docDB {
         this.body._rev = '';
 
         // from child class
-        this.fields.forEach(function(fieldTypeArray){
+        this.fieldKeys.forEach(field => {
+            this.body[field] = '';
+        });
+        // this.fields.forEach(function(fieldTypeArray){
             
-            fieldTypeArray[0].forEach(function(field){
+        //     fieldTypeArray[0].forEach(function(field){
                 
-                this.body[field] = '';
-            }.bind(this));
-        }.bind(this));
+        //         this.body[field] = '';
+        //     }.bind(this));
+        // }.bind(this));
+    }
+
+    get fieldKeys(){
+        let keys = [];
+
+        // from child class
+        this.fields.forEach(fieldArray => {
+            fieldArray[0].forEach(field => {
+                keys.push(field);
+            });
+        });
+        return keys;
     }
 
     get(docId){
@@ -375,11 +394,7 @@ class Party extends modalDoc{
 
     constructor(){
         super();
-    }
-
-    get tableFields() {
-        return ['name', 'city', 'phone', 'email'];
-    }
+    }   
 
     get fields(){
         return [
@@ -389,6 +404,29 @@ class Party extends modalDoc{
                 [['phone', 'whatsapp'], 'phone']                
             ];
     }
+
+    get tableFields() {
+        return ['name', 'city', 'phone', 'email'];
+    }
+
+    get formFields(){
+        return ['name', 'contact', 'phone', 'whatsapp', 'email',  'address', 'city', 'district', 'state', 'pincode'];
+    }
+
+    get fieldAlias(){
+        return {
+            'name' : 'Party Name',
+            'contact': 'Contact Name',
+            'phone': 'Phone',
+            'whatsapp': 'Whatsapp',
+            'email': 'Email',
+            'address': 'Street Address',
+            'city': 'City',
+            'district': 'District',
+            'state': 'State',
+            'pincode': 'Pincode'
+        }
+    }
 }
 
 class Payment extends modalDoc{
@@ -397,15 +435,28 @@ class Payment extends modalDoc{
         super();
     }
 
-    get tableFields(){
-        return ['party', 'mode', 'amount', 'created_at'];
-    }
-
     get fields(){
         return [
             [['party', 'notes', 'mode'], 'string'],
             [['amount'], 'number']
         ];
+    }
+
+    get tableFields(){
+        return ['party', 'mode', 'amount'];
+    }
+
+    get formFields(){
+        return ['party', 'mode', 'amount', 'notes'];
+    }
+
+    get fieldAlias(){
+        return {
+            'party': 'Party Name',
+            'mode': 'Payment Mode',
+            'amount': 'Amount',
+            'notes': 'Notes'
+        }
     }
 }
 
@@ -415,16 +466,30 @@ class Stock extends modalDoc{
         super();
     }
 
-    get tableFields(){
-        return ['name', 'quantity', 'price', 'discount', 'tax'];
-    }
-
     get fields(){
         return [
             [['name', 'discount', 'price'], 'string'],
             [['quantity'], 'number'],
-            [['discount', 'tax'], 'number']
+            [['tax'], 'number']
         ];
+    }
+
+    get tableFields(){
+        return ['name', 'quantity', 'price', 'discount', 'tax'];
+    }    
+    
+    get formFields(){
+        return ['name', 'quantity', 'price', 'discount', 'tax'];
+    }
+
+    get fieldAlias(){
+        return {
+            'name': 'Item Name',
+            'quantity': 'Quantity',
+            'price': "Price",
+            'discount': 'Discount',
+            'tax': 'Tax'
+        }
     }
 }
 
