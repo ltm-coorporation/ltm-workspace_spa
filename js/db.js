@@ -18,28 +18,28 @@ db.createIndex({
 })
 // .then((result) => console.log(result));
 
-// window.addEventListener('load', () =>  {
-
-//     db.replicate.to(remoteCouch)
-//         // .on('complete', (result) => console.log(result));
-//     db.replicate.from(remoteCouch)
-//         // .on('complete', (result) => console.log(result));
-//     appReload(false);
-//     var targetNode = document.getElementById('app');
-//     var config = { childList: true };    
-
+var targetNode = document.getElementById('app');
+    var config = { childList: true };
     
-//     // var callback = function(mutationList, observer){
-//     //     for(var mutation of mutationList){
-//     //         if(mutation.type == 'childList') return appReload();
-//     //     }
-//     // };
+var callback = function(mutationList, observer){
+    for(var mutation of mutationList){
+        if(mutation.type == 'childList') {
+            observer.disconnect();
+            return appReload()
+        };
+    }
+};
 
-//     // var observer = new MutationObserver(callback);
+var observer = new MutationObserver(callback);
 
-//     // observer.observe(targetNode, config);
+window.addEventListener('load', () =>  {
 
-// });
+    db.replicate.to(remoteCouch)
+        // .on('complete', (result) => console.log(result));
+    db.replicate.from(remoteCouch)
+        // .on('complete', (result) => console.log(result));
+    appReload(false);
+});
 
 function appReload(toggleNavbar = true){
 
@@ -79,6 +79,10 @@ function appReload(toggleNavbar = true){
     if(Object.keys(docToEdit).length){
         editDocument(docToEdit);
     }
+
+    setTimeout(() => {
+        observer.observe(targetNode, config);
+    }, 300); 
 }
 
 // common functions 

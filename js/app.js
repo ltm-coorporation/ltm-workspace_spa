@@ -56,7 +56,6 @@ window.addEventListener('load', () => {
     router.add('/party/add', () => {
         let html = partyAddTemplate();        
         el.html(html);
-        appReload();
     });
 
     router.add('/party/edit', () => {
@@ -74,7 +73,6 @@ window.addEventListener('load', () => {
     router.add('/payment/add', () => {
         let html = paymentsAddTemplae();       
         el.html(html);
-        appReload();
     });
 
     router.add('/payment/edit', () => {
@@ -85,14 +83,12 @@ window.addEventListener('load', () => {
     router.add('/stock', () => {
         let html = stockTemplate();
         showList('Stock');
-        // showStockList();
         el.html(html);
     });
 
     router.add('/stock/add', () => {
         let html = stockAddTemplate();        
         el.html(html);
-        appReload();
     });
 
     router.add('/stock/edit', () => {
