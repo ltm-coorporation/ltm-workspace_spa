@@ -57,13 +57,14 @@ class HTMLTable extends viewElements{
 class Form extends viewElements{
 
     constructor(modal = {}){
-        let elements = ['form', 'div', 'label', 'input'];
+        let elements = ['form', 'div', 'label', 'input', 'select', 'option'];
         super(elements);
         this.modal = modal;
         this.modalName = this.modal.constructor.name.toLowerCase();
         this.elements = elements;
         this.divTag.setAttribute('class', 'form-group');
         this.inputTag.setAttribute('class', 'form-control');
+        this.selectTag.setAttribute('class', 'form-control');
     }
 
     view(){
@@ -72,16 +73,25 @@ class Form extends viewElements{
         this.formTag.setAttribute('id', `form-${this.modalName}`);
         
         // console.log(this.modal);
-        this.modal.formFields.forEach(field => {            
+        this.modal.formFields.forEach(fieldArray => {
+            let field = fieldArray[0];
+            let fieldType = fieldArray[1];            
             this.labelTag.setAttribute('for', `${this.modalName}-${field}`)
             this.labelTag.innerHTML = this.modal.fieldAlias[field];
-            this.divTag.appendChild(this.labelTag.cloneNode(true));
+            this.divTag.appendChild(this.labelTag.cloneNode(true));            
             
+            if(fieldType == 'input'){
+                this.inputTag.setAttribute('type', 'text');
+                this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
+                this.divTag.appendChild(this.inputTag.cloneNode(true));
+            }
             
-            this.inputTag.setAttribute('type', 'text');
-            this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
-            // console.log(this.inputTag);
-            this.divTag.appendChild(this.inputTag.cloneNode(true));
+            if(fieldType == 'select'){
+                this.selectTag.setAttribute('id', `${this.modalName}-${field}`);
+                // this.optionTag.setAttribute('value', `${this}`);
+                this.selectTag.appendChild(this.optionTag.cloneNode(true));
+                this.divTag.appendChild(this.selectTag.cloneNode(true));
+            }
 
             let divValidation = this.divTag.cloneNode();
             divValidation.setAttribute('class', 'valid-feedback');

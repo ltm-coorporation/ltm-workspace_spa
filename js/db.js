@@ -57,20 +57,50 @@ function appReload(toggleNavbar = true){
     });
 
     // document.getElementById('btn-stock_add').addEventListener('click', stockAddClickHandler)
-    
-    $(new Form(new Stock()).view()).insertBefore('#btn-stock_add');
+    $.fn.select2.defaults.set( "theme", "bootstrap" );
+    // $(new Form(new Stock()).view()).insertBefore('#btn-stock_add');
     $('#btn-stock_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Stock');
     });
 
     $(new Form(new Payment()).view()).insertBefore('#btn-payment_add');
+    new Party().allPartyNames()
+    .then(partyNames => {
+        let data = [];
+        partyNames.forEach(partyName => {
+
+            let dataObj = {};
+            dataObj.id = partyName;
+            dataObj.text = partyName;
+            data.push(dataObj);
+        });
+        
+        $('#payment-party').select2({
+            // theme:'bootstrap',
+            placeholder: 'Select Party',
+            data: data,
+            tags: true,
+            allowClear: true
+        });
+
+        $('#payment-mode').select2({
+            // theme:'bootstrap',
+            placeholder: 'Select mode of Payment',
+            data: data,
+            tags: true,
+            allowClear: true
+        });
+    })
+    .catch(err => console.log(err));
+
+    // $('#party-name').
     $('#btn-payment_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Payment');
     });
 
-    $(new Form(new Party()).view()).insertBefore('#btn-party_add');
+    // $(new Form(new Party()).view()).insertBefore('#btn-party_add');
     $('#btn-party_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Party');
@@ -88,12 +118,13 @@ function appReload(toggleNavbar = true){
 // common functions 
 function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
-    document.getElementById(`form-${prefix}`).reset();
+    document.getElementById(`form-${prefix}`).reset();    
     fetchDataFromHTML(modal, false, true);
     var alertbox = document.getElementById(`alert-${prefix}_save`);
     alertbox.classList.remove('invisible');
     setTimeout(() => {
         alertbox.classList.add('invisible');
+        window.location.reload();
     }, 3000);
 }
 
@@ -300,7 +331,7 @@ class docDB {
         this.docBody.type = this.constructor.name.toLowerCase();
     }
 
-    allDocs(){
+    allDocs(){        
         return new Promise((resolve, reject) => {
             db.find({
                 selector:{ type: this.docBody.type},
@@ -452,6 +483,20 @@ class Party extends modalDoc{
             'pincode': 'Pincode'
         }
     }
+
+    allPartyNames(){
+        return new Promise((resolve, reject) => {
+                this.allDocs()
+                .then(docs => {
+                    let fieldArray = [];               
+                    docs.forEach(docObj => {
+                        fieldArray.push(docObj.doc.name);
+                    });
+
+                    resolve(fieldArray);
+                });
+            });    
+    }
 }
 
 class Payment extends modalDoc{
@@ -472,7 +517,12 @@ class Payment extends modalDoc{
     }
 
     get formFields(){
-        return ['party', 'mode', 'amount', 'notes'];
+        return [
+            ['party', 'select'],
+            ['mode', 'select'],
+            ['amount', 'input'],
+            ['notes', 'input']
+        ];
     }
 
     get fieldAlias(){
