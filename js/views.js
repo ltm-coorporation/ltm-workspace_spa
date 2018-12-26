@@ -82,6 +82,15 @@ class Form extends viewElements{
             this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
             // console.log(this.inputTag);
             this.divTag.appendChild(this.inputTag.cloneNode(true));
+
+            let divValidation = this.divTag.cloneNode();
+            divValidation.setAttribute('class', 'valid-feedback');
+            divValidation.innerHTML = 'Valid';
+            this.divTag.appendChild(divValidation.cloneNode(true));
+            divValidation.setAttribute('class', 'invalid-feedback');
+            divValidation.innerHTML = 'Invalid';
+            this.divTag.appendChild(divValidation.cloneNode(true));
+            
             this.formTag.appendChild(this.divTag.cloneNode(true));
 
             this.divTag.innerHTML = '';

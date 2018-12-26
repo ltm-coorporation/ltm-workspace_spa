@@ -1,3 +1,3 @@
 applications:
 - name: ltm-workspace
-  memory: 128M
+  memory: 48M

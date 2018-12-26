@@ -20,6 +20,7 @@
     "popper.js": "^1.14.6",
     "vanilla-router": "^1.2.6",
     "handlebars": "^4.0.12",
-    "pouchdb": "^7.0.0"
+    "pouchdb": "^7.0.0",
+    "select2": "^4.0.5"
   }
 }

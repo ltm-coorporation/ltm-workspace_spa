@@ -89,6 +89,7 @@ function appReload(toggleNavbar = true){
 function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
     document.getElementById(`form-${prefix}`).reset();
+    fetchDataFromHTML(modal, false, true);
     var alertbox = document.getElementById(`alert-${prefix}_save`);
     alertbox.classList.remove('invisible');
     setTimeout(() => {
@@ -150,7 +151,7 @@ function editDocument(editDoc){
     
     modal.get(editDoc._id)
     .then((doc) => {
-        console.log(doc);
+        // console.log(doc);
         document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
             let field = element.id.replace(`${prefix}`, '');
             document.getElementById(element.id).value = doc[field];
@@ -183,23 +184,43 @@ function updateDoc(modal, editDoc){
         let ltmObj = new ltm();
         ltmObj.navigateTo(editDoc.type);
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+        // console.log(err);
+        fetchDataFromHTML(modal, err);
+    });
 }
 
 function saveDoc(modalName){
     let modal = new classMapping[modalName];
     modal.save(fetchDataFromHTML(modal))
     .then((res) => alertDocSave(modal))
-    .catch(err => console.log(err));
+    .catch(err => {
+        // console.log(err)
+        fetchDataFromHTML(modal, err);
+    });
 }
 
-function fetchDataFromHTML(modal){
+function fetchDataFromHTML(modal, err, reset = false){
     var doc = {};
     var prefix = modal.constructor.name.toLowerCase() + '-';
 
     document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
+        
         let field = (element.id).replace(prefix, '');
-        doc[field] = document.getElementById(element.id).value;
+        let el = document.getElementById(element.id);
+        doc[field] = el.value;
+        
+        if(err){
+            if(!err[field].isValid){
+                el.setAttribute('class', 'form-control is-invalid')
+            } else {
+                el.setAttribute('class', 'form-control is-valid')
+            }
+        }
+        
+        if(reset){
+            el.setAttribute('class', 'form-control');
+        }
     });
 
     return doc;
