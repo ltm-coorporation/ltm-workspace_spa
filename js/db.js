@@ -320,9 +320,11 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         // console.log(err[field]);
         if(err){ 
             if(!err[field].isValid){
-                el.setAttribute('class', 'form-control is-invalid')
+                el.classList.remove('is-valid');
+                el.classList.add('is-invalid');
             } else {
-                el.setAttribute('class', 'form-control is-valid')
+                el.classList.remove('is-invalid');
+                el.classList.add('is-valid');
             }
         }
         
