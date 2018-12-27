@@ -58,21 +58,21 @@ function appReload(toggleNavbar = true){
 
     // document.getElementById('btn-stock_add').addEventListener('click', stockAddClickHandler)
     $.fn.select2.defaults.set( "theme", "bootstrap" );
-    // $(new Form(new Stock()).view()).insertBefore('#btn-stock_add');
+    $(new Form(new Stock()).view()).insertBefore('#btn-stock_add');
     $('#btn-stock_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Stock');
     });
 
     $(new Form(new Payment()).view()).insertBefore('#btn-payment_add');
-    new Party().allPartyNames()
-    .then(partyNames => {
+    new Party().allNameAndId()
+    .then(partyNamesAndId => {
         let data = [];
-        partyNames.forEach(partyName => {
+        partyNamesAndId.forEach(partyNameIdObj => {
 
             let dataObj = {};
-            dataObj.id = partyName;
-            dataObj.text = partyName;
+            dataObj.id = partyNameIdObj.id;
+            dataObj.text = partyNameIdObj.name;
             data.push(dataObj);
         });
         
@@ -87,7 +87,7 @@ function appReload(toggleNavbar = true){
         $('#payment-mode').select2({
             // theme:'bootstrap',
             placeholder: 'Select mode of Payment',
-            data: data,
+            data: new Payment().mode,
             tags: true,
             allowClear: true
         });
@@ -100,7 +100,7 @@ function appReload(toggleNavbar = true){
         saveDoc('Payment');
     });
 
-    // $(new Form(new Party()).view()).insertBefore('#btn-party_add');
+    $(new Form(new Party()).view()).insertBefore('#btn-party_add');
     $('#btn-party_add').on('click', (e) => {
         e.preventDefault();
         saveDoc('Party');
@@ -124,7 +124,7 @@ function alertDocSave(modal){
     alertbox.classList.remove('invisible');
     setTimeout(() => {
         alertbox.classList.add('invisible');
-        window.location.reload();
+        // window.location.reload();
     }, 3000);
 }
 
@@ -466,7 +466,18 @@ class Party extends modalDoc{
     }
 
     get formFields(){
-        return ['name', 'contact', 'phone', 'whatsapp', 'email',  'address', 'city', 'district', 'state', 'pincode'];
+        return [
+            ['name', 'input'],
+            ['contact', 'input'],
+            ['phone', 'input'],
+            ['whatsapp', 'input'],
+            ['email', 'input'],
+            ['address', 'input'],
+            ['city', 'input'],
+            ['district', 'input'],
+            ['state', 'input'],
+            ['pincode', 'input']
+        ]
     }
 
     get fieldAlias(){
@@ -482,20 +493,31 @@ class Party extends modalDoc{
             'state': 'State',
             'pincode': 'Pincode'
         }
-    }
+    }    
 
-    allPartyNames(){
+    allNameAndId(){
         return new Promise((resolve, reject) => {
                 this.allDocs()
                 .then(docs => {
                     let fieldArray = [];               
                     docs.forEach(docObj => {
-                        fieldArray.push(docObj.doc.name);
+                        let nameIdobj = {};
+                        nameIdobj.id = docObj.doc._id;
+                        nameIdobj.name = docObj.doc.name;
+                        fieldArray.push(nameIdobj);
                     });
 
                     resolve(fieldArray);
                 });
             });    
+    }
+
+    getNameById(id){
+        return new Promise((resolve, reject) => {
+            this.get(id)
+            .then(doc => resolve(doc.name))
+            .catch(err => reject(err));        
+        });
     }
 }
 
@@ -503,6 +525,35 @@ class Payment extends modalDoc{
 
     constructor(){
         super();
+    }
+
+    get mode(){
+        return [
+            {
+                id: 'cash',
+                text: 'Cash'
+            },
+            {
+                id: 'credit',
+                text: 'Credit'
+            },
+            {
+                id: 'upi',
+                text: 'UPI'
+            },
+            {
+                id: 'paytm',
+                text: 'PayTm'
+            },
+            {
+                id: 'cheque',
+                text: 'Cheque'
+            },
+            {
+                id: 'online',
+                text: 'Online Transfer'
+            },
+        ];
     }
 
     get fields(){
@@ -533,6 +584,32 @@ class Payment extends modalDoc{
             'notes': 'Notes'
         }
     }
+
+    allDocs(){
+        return new Promise((resolve, reject) => {
+            super.allDocs()
+            .then(docArray => {
+                let p = [];
+
+                docArray.forEach(docObj => {
+                    let partyId = docObj.doc.party; 
+                    p.push(
+                        new Promise((reso, rej) => {
+                            return new Party().getNameById(partyId)
+                                    .then(partyName => {
+                                        docObj.doc.party = partyName;
+                                    })
+                                    .then(_ => reso());
+                    }));
+                });
+
+                return Promise.all(p)
+                      .then(_ => docArray);              
+            })
+            .then(res => resolve(res))
+            .catch(err => reject(err));
+        });
+    }
 }
 
 class Stock extends modalDoc{
@@ -554,7 +631,13 @@ class Stock extends modalDoc{
     }    
     
     get formFields(){
-        return ['name', 'quantity', 'price', 'discount', 'tax'];
+        return [
+            ['name', 'input'],
+            ['quantity', 'input'],
+            ['price', 'input'],
+            ['discount', 'input'],
+            ['tax', 'input']
+        ]
     }
 
     get fieldAlias(){
