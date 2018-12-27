@@ -182,10 +182,14 @@ function editDocument(editDoc){
     
     modal.get(editDoc._id)
     .then((doc) => {
-        // console.log(doc);
+        console.log(doc);
         document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
             let field = element.id.replace(`${prefix}`, '');
-            document.getElementById(element.id).value = doc[field];
+            let el = document.getElementById(element.id);
+            el.value = doc[field];
+            setTimeout(() => {
+                el.dispatchEvent(new Event('change'));
+            }, 30); 
         });
         return;
     })
