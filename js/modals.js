@@ -350,8 +350,8 @@ class Stock extends modalDoc{
 
     get fields(){
         return [
-            [['name', 'discount', 'price'], 'string'],
-            [['quantity'], 'number'],
+            [['name', 'price'], 'string'],
+            [['quantity', 'discount'], 'number'],
             [['tax'], 'number']
         ];
     }
@@ -451,6 +451,32 @@ class Order extends modalDoc{
             'due_date': 'Due date',
             'notes': 'Notes'
         }
+    }
+
+    allDocs(){
+        return new Promise((resolve, reject) => {
+            super.allDocs()
+            .then(docArray => {
+                let p = [];
+
+                docArray.forEach(docObj => {
+                    let partyId = docObj.doc.party; 
+                    p.push(
+                        new Promise((reso, rej) => {
+                            return new Party().getNameById(partyId)
+                                    .then(partyName => {
+                                        docObj.doc.party = partyName;
+                                    })
+                                    .then(_ => reso());
+                    }));
+                });
+
+                return Promise.all(p)
+                      .then(_ => docArray);              
+            })
+            .then(res => resolve(res))
+            .catch(err => reject(err));
+        });
     }
 }
 
