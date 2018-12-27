@@ -14,6 +14,10 @@ window.addEventListener('load', () => {
     // home template
     const homeTemplate = Handlebars.compile($('#template-home').html());
 
+    //order templates
+    const orderTemplate = Handlebars.compile($('#template-order').html());
+    const orderAddTemplate = Handlebars.compile($('#template-order_add').html());
+
     //party templates
     const partyTemplate = Handlebars.compile($('#template-party').html());
     const partyAddTemplate = Handlebars.compile($('#template-party_add').html());
@@ -43,6 +47,23 @@ window.addEventListener('load', () => {
     // root
     router.add('/', () => {
         let html = homeTemplate();
+        el.html(html);
+    });
+
+    //order routes 
+    router.add('/order', () => {
+        let html = orderTemplate();
+        showList('Order');
+        el.html(html);
+    });
+
+    router.add('/order/add', () => {
+        let html = orderAddTemplate();        
+        el.html(html);
+    });
+
+    router.add('/order/edit', () => {
+        let html = orderAddTemplate();
         el.html(html);
     });
 

@@ -26,6 +26,13 @@
             
 
             <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Order</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="/order/add" class="dropdown-item navigator">Add</a>
+                    <a href="/order" class="dropdown-item navigator">List</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Party</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="/party/add" class="dropdown-item navigator">Add</a>
@@ -75,6 +82,54 @@
 </script>
 <!-- /home template -->
 
+<!-- order template -->
+<script id="template-order" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Order</li>
+        </ol>
+    </nav>
+    <div>
+        <h1>Order</h1>
+    </div>
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Party Name</th>
+                <th scope="col">Invoice No.</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Status</th>
+                <th scope="col">Payment Mode</th>
+                <th scope="col">Due Date</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody id="order-table_body"></tbody>
+    </table> 
+</script>
+<script id="template-order_add" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item"><a href="/order" class="navigator">Order</a> </li>
+            <li class="breadcrumb-item active" aria-current="page">Add<li>
+        </ol>
+    </nav>
+    <h1>Add Order</h1>
+    <br>
+    <button class="btn btn-success" id="btn-order_add">Save</button>
+    <br><br>
+    <div class="alert alert-success alert-dismissible fade show invisible" role="alert" id="alert-order_save">
+        <span>Order Added</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</script>
+<!-- /order template -->
+
 <!-- party templates -->
 <script id="template-party" type="text/x-handlebars-template">
     <nav aria-label="breadcrumb" class="shadow rounded">
@@ -110,48 +165,6 @@
     </nav>
     <h1>Add Party</h1>
     <br>
-    <!-- <form id="form-party">
-        <div class="form-group">
-            <label for="party-name">Party Name</label>
-            <input type="text" class="form-control" id="party-name">
-        </div>
-        <div class="form-group">
-            <label for="party-contact">Contact Name</label>
-            <input type="text" class="form-control" id="party-contact">
-        </div>
-        <div class="form-group">
-            <label for="party-phone">Phone</label>
-            <input type="text" class="form-control" id="party-phone">
-        </div>
-        <div class="form-group">
-            <label for="party-whatsapp">Whatsapp</label>
-            <input type="text" class="form-control" id="party-whatsapp">
-        </div>
-        <div class="form-group">
-            <label for="party-email">email</label>
-            <input type="text" class="form-control" id="party-email">
-        </div>
-        <div class="form-group">
-            <label for="party-address">Street Address</label>
-            <input type="text" class="form-control" id="party-address">
-        </div>
-        <div class="form-group">
-            <label for="party-city">City</label>
-            <input type="text" class="form-control" id="party-city">
-        </div>
-        <div class="form-group">
-            <label for="party-district">District</label>
-            <input type="text" class="form-control" id="party-district">
-        </div>
-        <div class="form-group">
-            <label for="party-state">State</label>
-            <input type="text" class="form-control" id="party-state">
-        </div>
-        <div class="form-group">
-            <label for="party-pincode">Pincode</label>
-            <input type="text" class="form-control" id="party-pincode">
-        </div>
-    </form> -->
     <button class="btn btn-success" id="btn-party_add">Save</button>
     <br><br>
     <div class="alert alert-success alert-dismissible fade show invisible" role="alert" id="alert-party_save">
@@ -311,6 +324,7 @@
 <script src="/bower_components/pouchdb/dist/pouchdb.find.min.js"></script>
 <script src="/js/views.js"></script>
 <script src="/js/app.js"></script>
+<script src="/js/modals.js"></script>
 <script src="/js/db.js"></script>
 </body>
 </html>
