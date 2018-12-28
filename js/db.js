@@ -169,6 +169,43 @@ function appReload(toggleNavbar = true){
     });
     // /payment module
 
+    // purchase module
+    $(new Form(new Purchase()).view()).insertBefore('#btn-purchase_add');
+    new Party().allNameAndId()
+    .then(partyNamesAndId => {
+        let data = [];
+        partyNamesAndId.forEach(partyNameIdObj => {
+
+            let dataObj = {};
+            dataObj.id = partyNameIdObj.id;
+            dataObj.text = partyNameIdObj.name;
+            data.push(dataObj);
+        });
+        
+        $('#purchase-party').select2({
+            // theme:'bootstrap',
+            placeholder: 'Select Party',
+            data: data,
+            tags: true,
+            allowClear: true
+        });
+
+        $('#purchase-payment_mode').select2({
+            // theme:'bootstrap',
+            placeholder: 'Select mode of Payment',
+            data: new Payment().mode,
+            tags: true,
+            allowClear: true
+        });
+    })
+    .catch(err => console.log(err));
+    
+    $('#btn-purchase_add').on('click', (e) => {
+        e.preventDefault();
+        saveDoc('purchase');
+    });
+    // /purchase module
+
     // party module
     $(new Form(new Party()).view()).insertBefore('#btn-party_add');
     $('#btn-party_add').on('click', (e) => {

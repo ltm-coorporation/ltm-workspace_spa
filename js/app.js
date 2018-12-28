@@ -30,6 +30,10 @@ window.addEventListener('load', () => {
     const stockTemplate = Handlebars.compile($('#template-stock').html());
     const stockAddTemplate = Handlebars.compile($('#template-stock_add').html());
 
+    //purchase templates
+    const purchaseTemplate = Handlebars.compile($('#template-purchase').html());
+    const purchaseAddTemplate = Handlebars.compile($('#template-purchase_add').html());
+    
     const router = new Router({
         mode: 'history',
         page404: (path) => {
@@ -114,6 +118,23 @@ window.addEventListener('load', () => {
 
     router.add('/stock/edit', () => {
         let html = stockAddTemplate();
+        el.html(html);
+    });
+
+    // purchase routes
+    router.add('/purchase', () => {
+        let html = purchaseTemplate();
+        showList('Purchase');
+        el.html(html);
+    });
+
+    router.add('/purchase/add', () => {
+        let html = purchaseAddTemplate();        
+        el.html(html);
+    });
+
+    router.add('/purchase/edit', () => {
+        let html = purchaseAddTemplate();
         el.html(html);
     });
 

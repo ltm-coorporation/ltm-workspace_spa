@@ -72,7 +72,6 @@ class Form extends viewElements{
         
         this.formTag.setAttribute('id', `form-${this.modalName}`);
         
-        // console.log(this.modal);
         this.modal.formFields.forEach(fieldArray => {
             let field = fieldArray[0];
             let fieldType = fieldArray[1];            

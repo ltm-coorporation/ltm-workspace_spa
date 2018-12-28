@@ -480,6 +480,69 @@ class Order extends modalDoc{
     }
 }
 
-const classMapping = { Order, Party, Payment, Stock };
+class Purchase extends modalDoc{
+    constructor(){
+        super();
+    }
+
+    get fields(){
+        return [
+            [['party', 'invoice', 'payment_mode', 'notes'], 'string'],
+            [['amount'], 'number']
+        ];
+    }
+
+    get tableFields(){
+        return ['party', 'invoice', 'payment_mode', 'amount', 'notes'];
+    }
+
+    get formFields(){
+        return [
+            ['party', 'select'],
+            ['invoice', 'input'],
+            ['payment_mode', 'select'],
+            ['amount', 'input'],
+            ['notes', 'input']
+        ];
+    }
+
+    get fieldAlias(){
+        return {
+            'party': 'Party Name',
+            'invoice': 'Invoice No.',
+            'payment_mode': 'Payment Mode',
+            'amount': 'Amount',
+            'notes' : 'Notes'
+        }
+    }
+
+    allDocs(){
+        return new Promise((resolve, reject) => {
+            super.allDocs()
+            .then(docArray => {
+                let p = [];
+
+                docArray.forEach(docObj => {
+                    let partyId = docObj.doc.party; 
+                    p.push(
+                        new Promise((reso, rej) => {
+                            return new Party().getNameById(partyId)
+                                    .then(partyName => {
+                                        docObj.doc.party = partyName;
+                                    })
+                                    .then(_ => reso());
+                    }));
+                });
+
+                return Promise.all(p)
+                      .then(_ => docArray);              
+            })
+            .then(res => resolve(res))
+            .catch(err => reject(err));
+        });
+    }
+}
+
+const classMapping = { Order, Party, Payment, Stock, Purchase };
 
 // /data modals
