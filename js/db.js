@@ -214,6 +214,14 @@ function appReload(toggleNavbar = true){
     });
     // / party module
 
+    // expense module
+    $(new Form(new Expense()).view()).insertBefore('#btn-expense_add');
+    $('#btn-expense_add').on('click', (e) => {
+        e.preventDefault();
+        saveDoc('Expense');
+    });
+    // / expense module
+
     // edit doc module
     if(Object.keys(docToEdit).length){
         editDocument(docToEdit);

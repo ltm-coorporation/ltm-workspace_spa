@@ -60,6 +60,13 @@
                     <a href="/purchase" class="dropdown-item navigator">List</a>
                 </div>
             </li>
+            <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Expense</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="/expense/add" class="dropdown-item navigator">Add</a>
+                    <a href="/expense" class="dropdown-item navigator">List</a>
+                </div>
+            </li>
         </ul>
     </div>
 </nav>
@@ -342,6 +349,50 @@
 </script>
  <!-- /purchases template -->
 
+<!-- expense template -->
+<script id="template-expense" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Expense</li>
+        </ol>
+    </nav>
+    <div>
+        <h1>Expense</h1>
+    </div>
+    <table class="table table-striped">
+        <thead class="thead-light sticky-top">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Expense Name</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody id="expense-table_body"></tbody>
+    </table>
+</script>
+
+<script id="template-expense_add" type="text/x-handlebars-template">
+    <nav aria-label="breadcrumb" class="shadow rounded">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="navigator">Home</a></li>
+            <li class="breadcrumb-item"><a href="/expense" class="navigator">Expense</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add</li>
+        </ol>
+    </nav>    
+    <h1>Add Expense</h1>
+    <br>
+    <button class="btn btn-success" id="btn-expense_add">Add Expense</button>
+    <br><br>
+    <div class="alert alert-success alert-dismissible fade show invisible" role="alert" id="alert-expense_save">
+        <span>Expense Saved</span>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</script>
+ <!-- /expense template -->
 
 <script src="/bower_components/jquery/dist/jquery.slim.min.js"></script>
 <script src="/bower_components/popper.js/dist/umd/popper.min.js"></script>

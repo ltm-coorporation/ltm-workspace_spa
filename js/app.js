@@ -33,6 +33,10 @@ window.addEventListener('load', () => {
     //purchase templates
     const purchaseTemplate = Handlebars.compile($('#template-purchase').html());
     const purchaseAddTemplate = Handlebars.compile($('#template-purchase_add').html());
+
+    //expense templates
+    const expenseTemplate = Handlebars.compile($('#template-expense').html());
+    const expenseAddTemplate = Handlebars.compile($('#template-expense_add').html());
     
     const router = new Router({
         mode: 'history',
@@ -104,6 +108,7 @@ window.addEventListener('load', () => {
         let html = paymentsAddTemplae();
         el.html(html);
     });
+
     // stock routes
     router.add('/stock', () => {
         let html = stockTemplate();
@@ -135,6 +140,23 @@ window.addEventListener('load', () => {
 
     router.add('/purchase/edit', () => {
         let html = purchaseAddTemplate();
+        el.html(html);
+    });
+
+    // expense routes
+    router.add('/expense', () => {
+        let html = expenseTemplate();
+        showList('Expense');
+        el.html(html);
+    });
+
+    router.add('/expense/add', () => {
+        let html = expenseAddTemplate();        
+        el.html(html);
+    });
+
+    router.add('/expense/edit', () => {
+        let html = expenseAddTemplate();
         el.html(html);
     });
 

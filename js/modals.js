@@ -543,6 +543,39 @@ class Purchase extends modalDoc{
     }
 }
 
-const classMapping = { Order, Party, Payment, Stock, Purchase };
+class Expense extends modalDoc{
+    constructor(){
+        super();
+    }
+
+    get fields(){
+        return [
+            [['name', 'notes'], 'string'],
+            [['amount'], 'number']
+        ];
+    }
+
+    get tableFields(){
+        return ['name', 'amount'];
+    }
+
+    get formFields(){
+        return [
+            ['name', 'input'],
+            ['amount', 'input'],
+            ['notes', 'input']
+        ];
+    }
+
+    get fieldAlias(){
+        return {
+            'name': 'Expense Name',
+            'amount': 'Amount',
+            'notes': 'Notes'
+        }
+    }
+}
+
+const classMapping = { Order, Party, Payment, Stock, Purchase, Expense };
 
 // /data modals
