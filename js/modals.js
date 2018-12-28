@@ -258,32 +258,10 @@ class Payment extends modalDoc{
     }
 
     get mode(){
-        return [
-            {
-                id: 'cash',
-                text: 'Cash'
-            },
-            {
-                id: 'credit',
-                text: 'Credit'
-            },
-            {
-                id: 'upi',
-                text: 'UPI'
-            },
-            {
-                id: 'paytm',
-                text: 'PayTm'
-            },
-            {
-                id: 'cheque',
-                text: 'Cheque'
-            },
-            {
-                id: 'online',
-                text: 'Online Transfer'
-            },
-        ];
+        let obj = sharedConst.order_status;
+        return Object.keys(obj).map(k => {
+            return { id : obj[k].toLowerCase(), text: obj[k]};
+        });
     }
 
     get fields(){
@@ -404,13 +382,10 @@ class Order extends modalDoc{
     }
 
     get status() {
-        return [
-            { id: 'completed'  , text: 'Completed'  },
-            { id: 'pending'    , text: 'Pending'    },
-            { id: 'processing' , text: 'Processing' },
-            { id: 'cancelled'  , text: 'Cancelled'  },
-            { id: 'halt'       , text: 'Halt'       }
-        ];
+        let obj = sharedConst.order_status;
+        return Object.keys(obj).map(k => {
+            return { id : obj[k].toLowerCase(), text: obj[k]};
+        });
     }
 
     get fields(){
