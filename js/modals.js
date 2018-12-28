@@ -487,13 +487,13 @@ class Purchase extends modalDoc{
 
     get fields(){
         return [
-            [['party', 'invoice', 'payment_mode', 'notes'], 'string'],
-            [['amount'], 'number']
+            [['party', 'payment_mode', 'notes'], 'string'],
+            [['amount', 'invoice'], 'number']
         ];
     }
 
     get tableFields(){
-        return ['party', 'invoice', 'payment_mode', 'amount', 'notes'];
+        return ['party', 'invoice', 'payment_mode', 'amount'];
     }
 
     get formFields(){

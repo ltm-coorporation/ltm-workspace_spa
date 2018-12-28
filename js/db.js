@@ -202,7 +202,7 @@ function appReload(toggleNavbar = true){
     
     $('#btn-purchase_add').on('click', (e) => {
         e.preventDefault();
-        saveDoc('purchase');
+        saveDoc('Purchase');
     });
     // /purchase module
 
@@ -366,7 +366,8 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         }
         
         if(reset){
-            el.setAttribute('class', 'form-control');
+            el.classList.remove('is-invalid');
+            el.classList.remove('is-valid');
         }
     });
 
