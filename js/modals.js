@@ -276,8 +276,8 @@ class Party extends modalDoc{
 
     get fields(){
         return [
-                [['name', 'contact', 'phone', 'address', 'city', 'district', 'state'], 'string', 'requires string'],
-                [['pincode'], 'number'],
+                [['name', 'contact',  'address', 'city', 'district', 'state'], 'string'],
+                [['pincode'], 'number', 'should be a number'],
                 [['email'], 'email'],
                 [['phone', 'whatsapp'], 'phone']                
             ];

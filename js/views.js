@@ -74,18 +74,25 @@ class Form extends viewElements{
         
         this.modal.formFields.forEach(fieldArray => {
             let field = fieldArray[0];
-            let fieldType = fieldArray[1];
+            let fieldTag = fieldArray[1];
+            let fieldType = fieldArray[2] || 'text';
+            let msgInValid = 'InValid';
+            this.modal.fields.forEach(fa => {
+                if(fa[0].includes(field)){
+                    msgInValid = fa[2] || msgInValid;
+                }
+            })
             this.labelTag.setAttribute('for', `${this.modalName}-${field}`)
             this.labelTag.innerHTML = this.modal.fieldAlias[field];
             this.divTag.appendChild(this.labelTag.cloneNode(true));            
             
-            if(fieldType == 'input'){
-                this.inputTag.setAttribute('type', 'text');
+            if(fieldTag == 'input'){
+                this.inputTag.setAttribute('type', fieldType);
                 this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
                 this.divTag.appendChild(this.inputTag.cloneNode(true));
             }
             
-            if(fieldType == 'select'){
+            if(fieldTag == 'select'){
                 this.selectTag.setAttribute('id', `${this.modalName}-${field}`);
                 // this.optionTag.setAttribute('value', `${this}`);
                 this.selectTag.appendChild(this.optionTag.cloneNode(true));
@@ -97,7 +104,7 @@ class Form extends viewElements{
             divValidation.innerHTML = 'Valid';
             this.divTag.appendChild(divValidation.cloneNode(true));
             divValidation.setAttribute('class', 'invalid-feedback');
-            divValidation.innerHTML = 'Invalid';
+            divValidation.innerHTML = msgInValid;
             this.divTag.appendChild(divValidation.cloneNode(true));
             
             this.formTag.appendChild(this.divTag.cloneNode(true));
