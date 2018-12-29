@@ -1,6 +1,30 @@
 
 // data modals
 
+class Common{
+    constructor(){}
+
+    getKeyById(docArray, modal, key){
+        let p = [];
+
+        let field = modal.constructor.name.toLowerCase();
+        docArray.forEach(docObj => {
+            let keyDocId = docObj.doc[field]; 
+            p.push(
+                new Promise((reso, rej) => {
+                    return modal.getKeyById(key, keyDocId)
+                            .then(value => {
+                                docObj.doc[field] = value;
+                            })
+                            .then(_ => reso());
+            }));
+        });
+
+        return Promise.all(p)
+              .then(_ => docArray);              
+    }
+}
+
 class Validator{
 
     is_float(){
@@ -53,6 +77,9 @@ class Validator{
         return validDoc;
     }
 }
+/**
+ * Common class for all document database operations.
+ */
 class docDB {
 
     constructor(){
@@ -60,6 +87,11 @@ class docDB {
         this.docBody._id = '';
         this.docBody.type = this.constructor.name.toLowerCase();
     }
+
+    /**
+     * return all document objects as array
+     * @return {object[]} document[]
+     */
 
     allDocs(){        
         return new Promise((resolve, reject) => {
@@ -74,6 +106,47 @@ class docDB {
         });        
     }
 
+    /**
+     * returns only specified 'key in document (key) ' and 'document id(id)'
+     * @param {string} key - Key to fetch from document. 
+     * @return {object} id,key
+     */
+
+    allKeyAndId(key){
+        return new Promise((resolve, reject) => {
+            this.allDocs()
+            .then(docs => {
+                let fieldArray = [];               
+                docs.forEach(docObj => {
+                    let keyIdobj = {};
+                    keyIdobj.id = docObj.doc['_id'];
+                    keyIdobj[key] = docObj.doc[key];
+                    fieldArray.push(keyIdobj);
+                });
+                resolve(fieldArray);
+            });
+        });
+    }
+
+    /**
+     * return key value based on document id
+     * @param {string} key - key to fetch
+     * @param {string} id - document id
+     * @return {*} value - key value in document
+     */
+    getKeyById(key, id){
+        return new Promise((resolve, reject) => {
+            this.get(id)
+            .then(doc => resolve(doc[key]))
+            .catch(err => reject(err));        
+        });
+    }
+
+    /**
+     * return 'document' find by using 'document id'.
+     * @param {string} docId -document if to fetch
+     * @return {object} doc - fetched document
+     */
     get(docId){
         return new Promise((resolve, reject) => {
             db.find({
@@ -87,11 +160,21 @@ class docDB {
         });
     }
 
+    /**
+     * return validation result of document
+     * @param {object} doc -document to validate
+     */
     validate(doc){
         let v = new Validator();
         return  v.validate(doc, this.fields);
     }
 
+    /**
+     * returns promise of document save which should contain 
+     * result if successfull and err if document in invalidated.
+     * @param {object} docToSave - document to save.
+     * @return {Promise} err and successfull - based on validation and saving doc.
+     */
     save(docToSave){
         
         Object.assign(this.docBody, docToSave)
@@ -129,6 +212,10 @@ class docDB {
     }
 }
 
+/**
+ * Common class for all modals.
+ * @augments docDB
+ */
 class modalDoc extends docDB {
     constructor(){
         super();
@@ -161,9 +248,9 @@ class modalDoc extends docDB {
         return keys;
     }
 
-    get(docId){
-        return super.get(docId);
-    }
+    // get(docId){
+    //     return super.get(docId);
+    // }
 
     save(docToSave){
         Object.assign(this.body, docToSave);
@@ -176,6 +263,11 @@ class modalDoc extends docDB {
                 });
     }
 }
+
+/**
+ * Class for party modal.
+ * @augments modalDoc
+ */
 class Party extends modalDoc{
 
     constructor(){
@@ -184,7 +276,7 @@ class Party extends modalDoc{
 
     get fields(){
         return [
-                [['name', 'contact', 'phone', 'address', 'city', 'district', 'state'], 'string'],
+                [['name', 'contact', 'phone', 'address', 'city', 'district', 'state'], 'string', 'requires string'],
                 [['pincode'], 'number'],
                 [['email'], 'email'],
                 [['phone', 'whatsapp'], 'phone']                
@@ -226,31 +318,37 @@ class Party extends modalDoc{
     }    
 
     allNameAndId(){
-        return new Promise((resolve, reject) => {
-                this.allDocs()
-                .then(docs => {
-                    let fieldArray = [];               
-                    docs.forEach(docObj => {
-                        let nameIdobj = {};
-                        nameIdobj.id = docObj.doc._id;
-                        nameIdobj.name = docObj.doc.name;
-                        fieldArray.push(nameIdobj);
-                    });
+        return this.allKeyAndId('name');
+        // return new Promise((resolve, reject) => {
+        //         this.allDocs()
+        //         .then(docs => {
+        //             let fieldArray = [];               
+        //             docs.forEach(docObj => {
+        //                 let nameIdobj = {};
+        //                 nameIdobj.id = docObj.doc._id;
+        //                 nameIdobj.name = docObj.doc.name;
+        //                 fieldArray.push(nameIdobj);
+        //             });
 
-                    resolve(fieldArray);
-                });
-            });    
+        //             resolve(fieldArray);
+        //         });
+        //     }); 
     }
 
     getNameById(id){
-        return new Promise((resolve, reject) => {
-            this.get(id)
-            .then(doc => resolve(doc.name))
-            .catch(err => reject(err));        
-        });
+        return this.getKeyById('name', id);
+        // return new Promise((resolve, reject) => {
+        //     this.get(id)
+        //     .then(doc => resolve(doc.name))
+        //     .catch(err => reject(err));        
+        // });
     }
 }
 
+/**
+ * Class for payment modal.
+ * @augments modalDoc
+ */
 class Payment extends modalDoc{
 
     constructor(){
@@ -258,7 +356,7 @@ class Payment extends modalDoc{
     }
 
     get mode(){
-        let obj = sharedConst.order_status;
+        let obj = sharedConst.payment_mode;
         return Object.keys(obj).map(k => {
             return { id : obj[k].toLowerCase(), text: obj[k]};
         });
@@ -297,28 +395,34 @@ class Payment extends modalDoc{
         return new Promise((resolve, reject) => {
             super.allDocs()
             .then(docArray => {
-                let p = [];
+                return new Common().getKeyById(docArray, new Party(), 'name');
+                // let p = [];
 
-                docArray.forEach(docObj => {
-                    let partyId = docObj.doc.party; 
-                    p.push(
-                        new Promise((reso, rej) => {
-                            return new Party().getNameById(partyId)
-                                    .then(partyName => {
-                                        docObj.doc.party = partyName;
-                                    })
-                                    .then(_ => reso());
-                    }));
-                });
+                // docArray.forEach(docObj => {
+                //     let partyId = docObj.doc.party; 
+                //     p.push(
+                //         new Promise((reso, rej) => {
+                //             return new Party().getNameById(partyId)
+                //                     .then(partyName => {
+                //                         docObj.doc.party = partyName;
+                //                     })
+                //                     .then(_ => reso());
+                //     }));
+                // });
 
-                return Promise.all(p)
-                      .then(_ => docArray);              
+                // return Promise.all(p)
+                //       .then(_ => docArray);            
             })
             .then(res => resolve(res))
             .catch(err => reject(err));
         });
     }
 }
+
+/**
+ * Class for stock modal.
+ * @augments modalDoc
+ */
 
 class Stock extends modalDoc{
 
@@ -359,23 +463,27 @@ class Stock extends modalDoc{
     }
 
     allNameAndId(){
-        return new Promise((resolve, reject) => {
-            this.allDocs()
-            .then(docs => {
-                let fieldArray = [];               
-                docs.forEach(docObj => {
-                    let nameIdobj = {};
-                    nameIdobj.id = docObj.doc._id;
-                    nameIdobj.name = docObj.doc.name;
-                    fieldArray.push(nameIdobj);
-                });
-                resolve(fieldArray);
-            });
-        });
+        return super.allKeyAndId('name');
+        // return new Promise((resolve, reject) => {
+        //     this.allDocs()
+        //     .then(docs => {
+        //         let fieldArray = [];               
+        //         docs.forEach(docObj => {
+        //             let nameIdobj = {};
+        //             nameIdobj.id = docObj.doc._id;
+        //             nameIdobj.name = docObj.doc.name;
+        //             fieldArray.push(nameIdobj);
+        //         });
+        //         resolve(fieldArray);
+        //     });
+        // });
     }
 }
 
-
+/**
+ * Class for order modal.
+ * @augments modalDoc
+ */
 class Order extends modalDoc{
     constructor(){
         super();
@@ -432,22 +540,23 @@ class Order extends modalDoc{
         return new Promise((resolve, reject) => {
             super.allDocs()
             .then(docArray => {
-                let p = [];
+                return new Common().getKeyById(docArray, new Party(), 'name');
+                // let p = [];
 
-                docArray.forEach(docObj => {
-                    let partyId = docObj.doc.party; 
-                    p.push(
-                        new Promise((reso, rej) => {
-                            return new Party().getNameById(partyId)
-                                    .then(partyName => {
-                                        docObj.doc.party = partyName;
-                                    })
-                                    .then(_ => reso());
-                    }));
-                });
+                // docArray.forEach(docObj => {
+                //     let partyId = docObj.doc.party; 
+                //     p.push(
+                //         new Promise((reso, rej) => {
+                //             return new Party().getNameById(partyId)
+                //                     .then(partyName => {
+                //                         docObj.doc.party = partyName;
+                //                     })
+                //                     .then(_ => reso());
+                //     }));
+                // });
 
-                return Promise.all(p)
-                      .then(_ => docArray);              
+                // return Promise.all(p)
+                //       .then(_ => docArray);           
             })
             .then(res => resolve(res))
             .catch(err => reject(err));
@@ -455,6 +564,10 @@ class Order extends modalDoc{
     }
 }
 
+/**
+ * Class for purchase modal.
+ * @augments modalDoc
+ */
 class Purchase extends modalDoc{
     constructor(){
         super();
@@ -495,22 +608,23 @@ class Purchase extends modalDoc{
         return new Promise((resolve, reject) => {
             super.allDocs()
             .then(docArray => {
-                let p = [];
+                return new Common().getKeyById(docArray, new Party(), 'name');
+                // let p = [];
 
-                docArray.forEach(docObj => {
-                    let partyId = docObj.doc.party; 
-                    p.push(
-                        new Promise((reso, rej) => {
-                            return new Party().getNameById(partyId)
-                                    .then(partyName => {
-                                        docObj.doc.party = partyName;
-                                    })
-                                    .then(_ => reso());
-                    }));
-                });
+                // docArray.forEach(docObj => {
+                //     let partyId = docObj.doc.party; 
+                //     p.push(
+                //         new Promise((reso, rej) => {
+                //             return new Party().getNameById(partyId)
+                //                     .then(partyName => {
+                //                         docObj.doc.party = partyName;
+                //                     })
+                //                     .then(_ => reso());
+                //     }));
+                // });
 
-                return Promise.all(p)
-                      .then(_ => docArray);              
+                // return Promise.all(p)
+                //       .then(_ => docArray);              
             })
             .then(res => resolve(res))
             .catch(err => reject(err));
@@ -518,6 +632,10 @@ class Purchase extends modalDoc{
     }
 }
 
+/**
+ * Class for expense modal.
+ * @augments modalDoc
+ */
 class Expense extends modalDoc{
     constructor(){
         super();

@@ -183,7 +183,6 @@ function appReload(toggleNavbar = true){
         });
         
         $('#purchase-party').select2({
-            // theme:'bootstrap',
             placeholder: 'Select Party',
             data: data,
             tags: true,
@@ -191,7 +190,6 @@ function appReload(toggleNavbar = true){
         });
 
         $('#purchase-payment_mode').select2({
-            // theme:'bootstrap',
             placeholder: 'Select mode of Payment',
             data: new Payment().mode,
             tags: true,

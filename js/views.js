@@ -74,7 +74,7 @@ class Form extends viewElements{
         
         this.modal.formFields.forEach(fieldArray => {
             let field = fieldArray[0];
-            let fieldType = fieldArray[1];            
+            let fieldType = fieldArray[1];
             this.labelTag.setAttribute('for', `${this.modalName}-${field}`)
             this.labelTag.innerHTML = this.modal.fieldAlias[field];
             this.divTag.appendChild(this.labelTag.cloneNode(true));            
