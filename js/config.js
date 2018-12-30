@@ -1,4 +1,5 @@
-const sharedConst = {
+
+const globalConst = {
     'payment_mode': {
         1: 'Cash',
         2: 'Credit',
@@ -8,7 +9,7 @@ const sharedConst = {
         6: 'Online-Transfer'
     },
 
-    'order_status':{
+    'process_status':{
         1: 'Completed',
         2: 'Pending',
         3: 'Processing',

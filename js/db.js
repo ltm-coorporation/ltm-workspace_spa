@@ -76,7 +76,7 @@ function appReload(toggleNavbar = true){
             // theme:'bootstrap',
             placeholder: 'Select Party',
             data: data,
-            tags: true,
+            // tags: true,
             allowClear: true
         });
 
@@ -84,7 +84,7 @@ function appReload(toggleNavbar = true){
             // theme:'bootstrap',
             placeholder: 'Select mode of Payment',
             data: new Payment().mode,
-            tags: true,
+            // tags: true,
             allowClear: true
         });
     })
@@ -105,7 +105,7 @@ function appReload(toggleNavbar = true){
             // theme:'bootstrap',
             placeholder: 'Select item',
             data: data,
-            tags: true,
+            // tags: true,
             allowClear: true
         });
     })
@@ -114,7 +114,7 @@ function appReload(toggleNavbar = true){
     $('#order-status').select2({
         placeholder: 'Select Status',
         data: new Order().status,
-        tags: true,
+        // tags: true,
         allowClear: true
     });
 
@@ -149,7 +149,7 @@ function appReload(toggleNavbar = true){
             // theme:'bootstrap',
             placeholder: 'Select Party',
             data: data,
-            tags: true,
+            // tags: true,
             allowClear: true
         });
 
@@ -157,7 +157,7 @@ function appReload(toggleNavbar = true){
             // theme:'bootstrap',
             placeholder: 'Select mode of Payment',
             data: new Payment().mode,
-            tags: true,
+            // tags: true,
             allowClear: true
         });
     })
@@ -185,14 +185,14 @@ function appReload(toggleNavbar = true){
         $('#purchase-party').select2({
             placeholder: 'Select Party',
             data: data,
-            tags: true,
+            // tags: true,
             allowClear: true
         });
 
         $('#purchase-payment_mode').select2({
             placeholder: 'Select mode of Payment',
             data: new Payment().mode,
-            tags: true,
+            // tags: true,
             allowClear: true
         });
     })

@@ -276,10 +276,10 @@ class Party extends modalDoc{
 
     get fields(){
         return [
-                [['name', 'contact',  'address', 'city', 'district', 'state'], 'string'],
-                [['pincode'], 'number', 'should be a number'],
-                [['email'], 'email'],
-                [['phone', 'whatsapp'], 'phone']                
+                [['name', 'contact',  'address', 'city', 'district', 'state'], 'string', 'Should be characters'],
+                [['pincode'], 'number', 'Should be a number'],
+                [['email'], 'email', 'Should be a valid email'],
+                [['phone', 'whatsapp'], 'phone', 'Should be a valid phone number']                
             ];
     }
 
@@ -356,7 +356,7 @@ class Payment extends modalDoc{
     }
 
     get mode(){
-        let obj = sharedConst.payment_mode;
+        let obj = globalConst.payment_mode;
         return Object.keys(obj).map(k => {
             return { id : obj[k].toLowerCase(), text: obj[k]};
         });
@@ -490,9 +490,9 @@ class Order extends modalDoc{
     }
 
     get status() {
-        let obj = sharedConst.order_status;
+        let obj = globalConst.process_status;
         return Object.keys(obj).map(k => {
-            return { id : obj[k].toLowerCase(), text: obj[k]};
+            return { id : k, text: obj[k]};
         });
     }
 
