@@ -57,7 +57,7 @@ class HTMLTable extends viewElements{
 class Form extends viewElements{
 
     constructor(modal = {}){
-        let elements = ['form', 'div', 'label', 'input', 'select', 'option'];
+        let elements = ['form', 'div', 'label', 'input', 'select', 'option', 'textarea'];
         super(elements);
         this.modal = modal;
         this.modalName = this.modal.constructor.name.toLowerCase();
@@ -65,6 +65,7 @@ class Form extends viewElements{
         this.divTag.setAttribute('class', 'form-group');
         this.inputTag.setAttribute('class', 'form-control');
         this.selectTag.setAttribute('class', 'form-control');
+        this.textareaTag.setAttribute('class', 'form-control');
     }
 
     view(){
@@ -120,19 +121,30 @@ class Form extends viewElements{
                 this.labelTag.innerHTML = this.modal.fieldAlias[field];
                 this.divTag.appendChild(this.labelTag.cloneNode(true));            
                 
-                if(fieldTag == 'input'){
-                    this.inputTag.setAttribute('type', fieldType);
-                    this.inputTag.setAttribute('step', fieldStep);
-                    this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
-                    this.divTag.appendChild(this.inputTag.cloneNode(true));
+                let tagId = `${this.modalName}-${field}`;
+                switch(fieldTag){
+                    case 'input':{
+                                    this.inputTag.setAttribute('type', fieldType);
+                                    this.inputTag.setAttribute('step', fieldStep);
+                                    this.inputTag.setAttribute('id', tagId);
+                                    this.inputTag.setAttribute('placeholder', `Enter ${this.modal.fieldAlias[field]}`);
+                                    this.divTag.appendChild(this.inputTag.cloneNode(true));
+                                }
+                                break;
+                    case 'select': {
+                                    this.selectTag.setAttribute('id', tagId);
+                                    // this.optionTag.setAttribute('value', `${this}`);
+                                    this.selectTag.appendChild(this.optionTag.cloneNode(true));
+                                    this.divTag.appendChild(this.selectTag.cloneNode(true));
+                                }
+                                break;
+                    case 'textarea': this.textareaTag.setAttribute('id', tagId);
+                                     this.textareaTag.setAttribute('placeholder', `Enter ${this.modal.fieldAlias[field]}`);
+                                     this.divTag.appendChild(this.textareaTag.cloneNode(true));
                 }
+                // if(fieldTag == 'input')
                 
-                if(fieldTag == 'select'){
-                    this.selectTag.setAttribute('id', `${this.modalName}-${field}`);
-                    // this.optionTag.setAttribute('value', `${this}`);
-                    this.selectTag.appendChild(this.optionTag.cloneNode(true));
-                    this.divTag.appendChild(this.selectTag.cloneNode(true));
-                }
+                // if(fieldTag == 'select')
                 let divValidation = this.divTag.cloneNode();
                 divValidation.setAttribute('class', 'valid-feedback');
                 divValidation.innerHTML = 'Valid';

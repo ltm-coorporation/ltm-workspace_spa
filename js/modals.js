@@ -378,7 +378,7 @@ class Payment extends modalDoc{
             ['party', 'select'],
             ['payment_mode', 'select'],
             ['amount', 'input', 'number', '0.002'],
-            ['notes', 'input']
+            ['notes', 'textarea']
         ];
     }
 
@@ -524,7 +524,7 @@ class Order extends modalDoc{
             ['payment_mode', 'select'],
             ['status', 'select'],
             ['due_date', 'input'],
-            ['notes', 'input']
+            ['notes', 'textarea']
         ];
     }
 
@@ -617,7 +617,7 @@ class Purchase extends modalDoc{
             ['invoice', 'input'],
             ['payment_mode', 'select'],
             ['amount', 'input'],
-            ['notes', 'input']
+            ['notes', 'textarea']
         ];
     }
 
@@ -683,7 +683,7 @@ class Expense extends modalDoc{
         return [
             ['name', 'input'],
             ['amount', 'input'],
-            ['notes', 'input']
+            ['notes', 'textarea']
         ];
     }
 
