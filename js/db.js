@@ -4,7 +4,7 @@ var db = new PouchDB(uuid);
 var remoteCouch = `http://ltm:qwerty@localhost:5984/${uuid}`;
 // var account = 'a9b5854b-543d-4dba-b22d-bd4a899d2dd3-bluemix';
 // var remoteCouch = `https://oughtchaveringstensiling:8eceff51782b5087bcb3d318fd9e1fed4b0fedf6@${account}.cloudant.com/ltm-app`;
-
+var itemData = [];
 var docToEdit = {};
 db.changes({
     since:'now',
@@ -89,7 +89,7 @@ function appReload(toggleNavbar = true){
         });
     })
     .catch(err => console.log(err));
-
+    // let itemData = []
     new Stock().allNameAndId()
     .then(stockNamesAndId => {
         let data = [];
@@ -100,7 +100,9 @@ function appReload(toggleNavbar = true){
             dataObj.text = stockNameIdObj.name;
             data.push(dataObj);
         });
-        
+
+        itemData = data;
+        // console.log(itemData);
         $('#order-item').select2({
             // theme:'bootstrap',
             placeholder: 'Select item',
@@ -108,8 +110,41 @@ function appReload(toggleNavbar = true){
             // tags: true,
             allowClear: true
         });
+
+        if(document.getElementById('order-item')){
+            setTimeout(() => {
+                orderItemObserver.observe(orderItemTarget, config);
+            }, 2000);
+        }
     })
-    .catch(err => console.log(err));
+    .catch(err => console.log(err));    
+
+    var orderItemTarget = document.getElementById('item-group');    
+            
+    var orderItemCB = function(mutationList, observer){
+        for(var mutation of mutationList){
+            if(mutation.type == 'childList') {
+                $('#order-item').select2({           
+                    placeholder: 'Select item',
+                    data: itemData,
+                    allowClear: true
+                });
+            };
+        }
+    };
+
+    var orderItemObserver = new MutationObserver(orderItemCB);
+    
+    
+    // $("body").on('DOMSubtreeModified', ".item-group", function() {
+    //     $('#order-item').select2({
+    //         // theme:'bootstrap',
+    //         placeholder: 'Select item',
+    //         data: itemData,
+    //         // tags: true,
+    //         allowClear: true
+    //     });
+    // });
 
     $('#order-status').select2({
         placeholder: 'Select Status',
@@ -381,9 +416,17 @@ function fetchDataFromHTML(modal, err = false, reset = false){
             if(!err[field].isValid){
                 el.classList.remove('is-valid');
                 el.classList.add('is-invalid');
+                if(el.nodeName == 'SELECT'){
+                    el.parentElement.querySelector('.select2-selection').classList.remove('is-valid');
+                    el.parentElement.querySelector('.select2-selection').classList.add('is-invalid');
+                }
             } else {
                 el.classList.remove('is-invalid');
                 el.classList.add('is-valid');
+                if(el.nodeName == 'SELECT'){
+                    el.parentElement.querySelector('.select2-selection').classList.remove('is-invalid');
+                    el.parentElement.querySelector('.select2-selection').classList.add('is-valid');
+                }
             }
         }
         

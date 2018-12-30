@@ -72,45 +72,76 @@ class Form extends viewElements{
         
         this.formTag.setAttribute('id', `form-${this.modalName}`);
         
-        this.modal.formFields.forEach(fieldArray => {
-            let field = fieldArray[0];
-            let fieldTag = fieldArray[1];
-            let fieldType = fieldArray[2] || 'text';
-            let fieldStep = fieldArray[3] || '';
-            let msgInValid = 'InValid';
-            this.modal.fields.forEach(fa => {
-                if(fa[0].includes(field)){
-                    msgInValid = fa[2] || msgInValid;
-                }
-            })
-            this.labelTag.setAttribute('for', `${this.modalName}-${field}`)
-            this.labelTag.innerHTML = this.modal.fieldAlias[field];
-            this.divTag.appendChild(this.labelTag.cloneNode(true));            
-            
-            if(fieldTag == 'input'){
-                this.inputTag.setAttribute('type', fieldType);
-                this.inputTag.setAttribute('step', fieldStep);
-                this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
-                this.divTag.appendChild(this.inputTag.cloneNode(true));
-            }
-            
-            if(fieldTag == 'select'){
-                this.selectTag.setAttribute('id', `${this.modalName}-${field}`);
-                // this.optionTag.setAttribute('value', `${this}`);
-                this.selectTag.appendChild(this.optionTag.cloneNode(true));
-                this.divTag.appendChild(this.selectTag.cloneNode(true));
-            }
-            let divValidation = this.divTag.cloneNode();
-            divValidation.setAttribute('class', 'valid-feedback');
-            divValidation.innerHTML = 'Valid';
-            this.divTag.appendChild(divValidation.cloneNode(true));
-            divValidation.setAttribute('class', 'invalid-feedback');
-            divValidation.innerHTML = msgInValid;
-            this.divTag.appendChild(divValidation.cloneNode(true));
-            
-            this.formTag.appendChild(this.divTag.cloneNode(true));
+        this.modal.formFields.forEach(formFieldArray => {
 
-            this.divTag.innerHTML = '';
+            if(formFieldArray[0] instanceof Array){
+                let div = document.createElement('div');
+                div.setAttribute('class', 'row');
+                formFieldArray.forEach(subFormFieldArray => {
+                    let innerDiv = document.createElement('div');
+                    innerDiv.appendChild(createFormGroup.call(this, subFormFieldArray));
+                    innerDiv.setAttribute('class', 'col');
+                    div.appendChild(innerDiv.cloneNode(true));
+                });
+                let btn = document.createElement('button');
+                btn.setAttribute('type', 'button');
+                btn.setAttribute('class', 'btn btn-primary');
+                btn.innerHTML = 'Button';
+                btn.addEventListener('click', function(){
+                    var parentDiv = this.parentNode;
+                    parentDiv.appendChild(div.cloneNode(true));
+                })
+                let div2 = document.createElement('div');
+                div2.setAttribute('id', `${formFieldArray[0][0]}-group`);
+                div2.appendChild(div.cloneNode(true));
+                div2.appendChild(btn);
+                this.formTag.appendChild(div2);
+
+            } else {
+                
+                this.formTag.appendChild(createFormGroup.call(this, formFieldArray));
+            }
+            
+            function createFormGroup(fieldArray){
+                // console.log(this);
+                
+                let field = fieldArray[0];
+                let fieldTag = fieldArray[1];
+                let fieldType = fieldArray[2] || 'text';
+                let fieldStep = fieldArray[3] || '';
+                let msgInValid = 'InValid';
+                this.modal.fields.forEach(fa => {
+                    if(fa[0].includes(field)){
+                        msgInValid = fa[2] || msgInValid;
+                    }
+                });
+                this.divTag.innerHTML = '';
+                this.labelTag.setAttribute('for', `${this.modalName}-${field}`)
+                this.labelTag.innerHTML = this.modal.fieldAlias[field];
+                this.divTag.appendChild(this.labelTag.cloneNode(true));            
+                
+                if(fieldTag == 'input'){
+                    this.inputTag.setAttribute('type', fieldType);
+                    this.inputTag.setAttribute('step', fieldStep);
+                    this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
+                    this.divTag.appendChild(this.inputTag.cloneNode(true));
+                }
+                
+                if(fieldTag == 'select'){
+                    this.selectTag.setAttribute('id', `${this.modalName}-${field}`);
+                    // this.optionTag.setAttribute('value', `${this}`);
+                    this.selectTag.appendChild(this.optionTag.cloneNode(true));
+                    this.divTag.appendChild(this.selectTag.cloneNode(true));
+                }
+                let divValidation = this.divTag.cloneNode();
+                divValidation.setAttribute('class', 'valid-feedback');
+                divValidation.innerHTML = 'Valid';
+                this.divTag.appendChild(divValidation.cloneNode(true));
+                divValidation.setAttribute('class', 'invalid-feedback');
+                divValidation.innerHTML = msgInValid;
+                this.divTag.appendChild(divValidation.cloneNode(true));
+                return this.divTag.cloneNode(true);
+            }
         });
 
         return this.formTag;

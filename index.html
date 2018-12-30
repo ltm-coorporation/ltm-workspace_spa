@@ -10,6 +10,25 @@
     
     <link rel="stylesheet" href="/bower_components/select2/dist/css/select2.min.css">
     <link rel="stylesheet" href="/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.min.css">
+    <style>
+        .form-control {
+            height: calc(2.25rem + -2px);
+        }
+        .select2-selection.is-invalid{
+            border-color: #dc3545;
+        }
+        .select2-selection.is-invalid:focus{
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        .select2-selection.is-valid{
+            border-color: #28a745;
+        }
+        .select2-selection.is-valid:focus{
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+    </style>
 </head>
 <body>
 

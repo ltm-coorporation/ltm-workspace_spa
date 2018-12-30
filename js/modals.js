@@ -516,7 +516,11 @@ class Order extends modalDoc{
         return [
             ['invoice', 'input'],
             ['party', 'select'],
-            [['item', 'select'],['quantity', 'input', 'number'],['amount', 'input', 'number']],
+            [
+                ['item', 'select'],
+                ['quantity', 'input', 'number'],
+                ['amount', 'input', 'number', '0.002']
+            ],
             ['payment_mode', 'select'],
             ['status', 'select'],
             ['due_date', 'input'],
