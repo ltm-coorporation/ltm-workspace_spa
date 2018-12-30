@@ -16,6 +16,4 @@ const globalConst = {
         4: 'Cancelled',
         5: 'Halt'
     },
-
-
 }

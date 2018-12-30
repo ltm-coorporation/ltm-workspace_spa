@@ -364,20 +364,20 @@ class Payment extends modalDoc{
 
     get fields(){
         return [
-            [['party', 'notes', 'mode'], 'string'],
+            [['party', 'notes', 'payment_mode'], 'string'],
             [['amount'], 'number']
         ];
     }
 
     get tableFields(){
-        return ['party', 'mode', 'amount'];
+        return ['party', 'payment_mode', 'amount'];
     }
 
     get formFields(){
         return [
             ['party', 'select'],
-            ['mode', 'select'],
-            ['amount', 'input'],
+            ['payment_mode', 'select'],
+            ['amount', 'input', 'number', '0.002'],
             ['notes', 'input']
         ];
     }
@@ -385,7 +385,7 @@ class Payment extends modalDoc{
     get fieldAlias(){
         return {
             'party': 'Party Name',
-            'mode': 'Payment Mode',
+            'payment_mode': 'Payment Mode',
             'amount': 'Amount',
             'notes': 'Notes'
         }
@@ -416,6 +416,10 @@ class Payment extends modalDoc{
             .then(res => resolve(res))
             .catch(err => reject(err));
         });
+    }
+    save(docToSave){
+        // console.log(docToSave);
+        return super.save(docToSave);
     }
 }
 
@@ -478,6 +482,7 @@ class Stock extends modalDoc{
         //     });
         // });
     }
+    
 }
 
 /**
@@ -511,9 +516,7 @@ class Order extends modalDoc{
         return [
             ['invoice', 'input'],
             ['party', 'select'],
-            ['item', 'select'],
-            ['quantity', 'input'],
-            ['amount', 'input'],            
+            [['item', 'select'],['quantity', 'input', 'number'],['amount', 'input', 'number']],
             ['payment_mode', 'select'],
             ['status', 'select'],
             ['due_date', 'input'],
@@ -561,6 +564,26 @@ class Order extends modalDoc{
             .then(res => resolve(res))
             .catch(err => reject(err));
         });
+    }
+    
+    save(docToSave){
+        return super.save(docToSave)
+                // .then(res => {
+                //     console.log(res);                    
+                //     return new Promise((resolve, reject) => {
+                //         let p = {};
+                //         p.party = res.party;
+                //         p.payment_mode = res.payment_mode;
+                //         p.amount = res.amount;
+                //         new Payment().save(p)
+                //         .then(doc => { 
+                //             console.log(doc);
+                //             resolve(this);
+                //         })
+                //         .catch(err => reject(err));
+                //     });
+                //     // return this;
+                // });
     }
 }
 

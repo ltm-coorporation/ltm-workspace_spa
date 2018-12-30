@@ -153,7 +153,7 @@ function appReload(toggleNavbar = true){
             allowClear: true
         });
 
-        $('#payment-mode').select2({
+        $('#payment-payment_mode').select2({
             // theme:'bootstrap',
             placeholder: 'Select mode of Payment',
             data: new Payment().mode,
@@ -233,7 +233,15 @@ function appReload(toggleNavbar = true){
 // common functions 
 function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
-    document.getElementById(`form-${prefix}`).reset();    
+    // document.getElementById(`form-${prefix}`).reset();
+    document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
+        // let field = element.id.replace(`${prefix}`, '');
+        let el = document.getElementById(element.id);
+        el.value = '';
+        setTimeout(() => {
+            el.dispatchEvent(new Event('change'));
+        }, 30); 
+    });   
     fetchDataFromHTML(modal, false, true);
     var alertbox = document.getElementById(`alert-${prefix}_save`);
     alertbox.classList.remove('invisible');
@@ -267,7 +275,14 @@ function tableRowBuilder(rowDataObj, rowFields, index){
 
     rowFields.forEach(function(key){
         if(rowDataObj.hasOwnProperty(key)){
-            td.innerHTML = (key == 'created_at')? (new Date(rowDataObj[key])).toLocaleDateString() : rowDataObj[key];
+            // console.log(key);
+            // // console.log(globalConst.process_status[key]);
+            switch(key){
+                case 'status': td.innerHTML = globalConst.process_status[rowDataObj[key]];
+                                break;
+                default: td.innerHTML = rowDataObj[key];
+            }
+            // td.innerHTML = (key == 'created_at')? (new Date(rowDataObj[key])).toLocaleDateString() : rowDataObj[key];
             tr.appendChild(td.cloneNode(true));
         }
     });
@@ -362,6 +377,7 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         // console.log(field)
         // console.log(err[field]);
         if(err){ 
+            console.log(err);
             if(!err[field].isValid){
                 el.classList.remove('is-valid');
                 el.classList.add('is-invalid');

@@ -76,6 +76,7 @@ class Form extends viewElements{
             let field = fieldArray[0];
             let fieldTag = fieldArray[1];
             let fieldType = fieldArray[2] || 'text';
+            let fieldStep = fieldArray[3] || '';
             let msgInValid = 'InValid';
             this.modal.fields.forEach(fa => {
                 if(fa[0].includes(field)){
@@ -88,6 +89,7 @@ class Form extends viewElements{
             
             if(fieldTag == 'input'){
                 this.inputTag.setAttribute('type', fieldType);
+                this.inputTag.setAttribute('step', fieldStep);
                 this.inputTag.setAttribute('id', `${this.modalName}-${field}`);
                 this.divTag.appendChild(this.inputTag.cloneNode(true));
             }
@@ -98,7 +100,6 @@ class Form extends viewElements{
                 this.selectTag.appendChild(this.optionTag.cloneNode(true));
                 this.divTag.appendChild(this.selectTag.cloneNode(true));
             }
-
             let divValidation = this.divTag.cloneNode();
             divValidation.setAttribute('class', 'valid-feedback');
             divValidation.innerHTML = 'Valid';
