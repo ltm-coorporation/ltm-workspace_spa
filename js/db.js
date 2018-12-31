@@ -59,6 +59,23 @@ function appReload(toggleNavbar = true){
     // document.getElementById('btn-stock_add').addEventListener('click', stockAddClickHandler)
     $.fn.select2.defaults.set( "theme", "bootstrap" );
 
+    if(window.location.pathname.includes('add') || window.location.pathname.includes('edit')){
+        let addFormName = window.location.pathname.split('/').slice(1,2).toString();   
+    
+        this[`${addFormName}AddForm`]();
+    }
+    
+    // edit doc module
+    if(Object.keys(docToEdit).length){
+        editDocument(docToEdit);
+    }
+    // /edit doc module
+    setTimeout(() => {
+        observer.observe(targetNode, config);
+    }, 300); 
+}
+
+function orderAddForm(){
     // order module
     $(new Form(new Order()).view()).insertBefore('#btn-order_add');
     new Party().allNameAndId()
@@ -158,52 +175,48 @@ function appReload(toggleNavbar = true){
         saveDoc('Order');
     });
     // / order module
+}
 
-    // stock module
-    $(new Form(new Stock()).view()).insertBefore('#btn-stock_add');
-    $('#btn-stock_add').on('click', (e) => {
-        e.preventDefault();
-        saveDoc('Stock');
-    });
-    // /stock module
+function paymentAddForm(){
+     // payment module
+     $(new Form(new Payment()).view()).insertBefore('#btn-payment_add');
+     new Party().allNameAndId()
+     .then(partyNamesAndId => {
+         let data = [];
+         partyNamesAndId.forEach(partyNameIdObj => {
+ 
+             let dataObj = {};
+             dataObj.id = partyNameIdObj.id;
+             dataObj.text = partyNameIdObj.name;
+             data.push(dataObj);
+         });
+         
+         $('#payment-party').select2({
+             // theme:'bootstrap',
+             placeholder: 'Select Party',
+             data: data,
+             // tags: true,
+             allowClear: true
+         });
+ 
+         $('#payment-payment_mode').select2({
+             // theme:'bootstrap',
+             placeholder: 'Select mode of Payment',
+             data: new Payment().mode,
+             // tags: true,
+             allowClear: true
+         });
+     })
+     .catch(err => console.log(err));
+     
+     $('#btn-payment_add').on('click', (e) => {
+         e.preventDefault();
+         saveDoc('Payment');
+     });
+     // /payment module
+}
 
-    // payment module
-    $(new Form(new Payment()).view()).insertBefore('#btn-payment_add');
-    new Party().allNameAndId()
-    .then(partyNamesAndId => {
-        let data = [];
-        partyNamesAndId.forEach(partyNameIdObj => {
-
-            let dataObj = {};
-            dataObj.id = partyNameIdObj.id;
-            dataObj.text = partyNameIdObj.name;
-            data.push(dataObj);
-        });
-        
-        $('#payment-party').select2({
-            // theme:'bootstrap',
-            placeholder: 'Select Party',
-            data: data,
-            // tags: true,
-            allowClear: true
-        });
-
-        $('#payment-payment_mode').select2({
-            // theme:'bootstrap',
-            placeholder: 'Select mode of Payment',
-            data: new Payment().mode,
-            // tags: true,
-            allowClear: true
-        });
-    })
-    .catch(err => console.log(err));
-    
-    $('#btn-payment_add').on('click', (e) => {
-        e.preventDefault();
-        saveDoc('Payment');
-    });
-    // /payment module
-
+function purchaseAddForm(){
     // purchase module
     $(new Form(new Purchase()).view()).insertBefore('#btn-purchase_add');
     new Party().allNameAndId()
@@ -238,7 +251,9 @@ function appReload(toggleNavbar = true){
         saveDoc('Purchase');
     });
     // /purchase module
+}
 
+function partyAddForm(){;
     // party module
     $(new Form(new Party()).view()).insertBefore('#btn-party_add');
     $('#btn-party_add').on('click', (e) => {
@@ -246,7 +261,9 @@ function appReload(toggleNavbar = true){
         saveDoc('Party');
     });
     // / party module
+}
 
+function expenseAddForm(){
     // expense module
     $(new Form(new Expense()).view()).insertBefore('#btn-expense_add');
     $('#btn-expense_add').on('click', (e) => {
@@ -254,15 +271,16 @@ function appReload(toggleNavbar = true){
         saveDoc('Expense');
     });
     // / expense module
+}
 
-    // edit doc module
-    if(Object.keys(docToEdit).length){
-        editDocument(docToEdit);
-    }
-    // /edit doc module
-    setTimeout(() => {
-        observer.observe(targetNode, config);
-    }, 300); 
+function stockAddForm(){
+    // stock module
+    $(new Form(new Stock()).view()).insertBefore('#btn-stock_add');
+    $('#btn-stock_add').on('click', (e) => {
+        e.preventDefault();
+        saveDoc('Stock');
+    });
+    // /stock module
 }
 
 // common functions 

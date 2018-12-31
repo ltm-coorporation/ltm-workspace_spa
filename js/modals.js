@@ -291,14 +291,14 @@ class Party extends modalDoc{
         return [
             ['name', 'input'],
             ['contact', 'input'],
-            ['phone', 'input'],
-            ['whatsapp', 'input'],
+            ['phone', 'input', 'tel'],
+            ['whatsapp', 'input', 'tel'],
             ['email', 'input'],
             ['address', 'input'],
             ['city', 'input'],
             ['district', 'input'],
             ['state', 'input'],
-            ['pincode', 'input']
+            ['pincode', 'input', 'number']
         ]
     }
 
@@ -614,9 +614,9 @@ class Purchase extends modalDoc{
     get formFields(){
         return [
             ['party', 'select'],
-            ['invoice', 'input'],
+            ['invoice', 'input', 'number'],
             ['payment_mode', 'select'],
-            ['amount', 'input'],
+            ['amount', 'input', 'number', '0.002'],
             ['notes', 'textarea']
         ];
     }

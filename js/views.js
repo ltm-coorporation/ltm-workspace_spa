@@ -155,7 +155,11 @@ class Form extends viewElements{
                 return this.divTag.cloneNode(true);
             }
         });
-
+        // console.log(this.formTag);
+        // this.formTag.firstElementChild.querySelectorAll('input', () => {
+        //     console.log(this);
+        //     this.setAttribute('autofocus','');
+        // });
         return this.formTag;
     }
 }
