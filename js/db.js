@@ -15,11 +15,11 @@ db.createIndex({
     index: {
         fields: ['_id','type']
     }
-})
+});
 // .then((result) => console.log(result));
 
 var targetNode = document.getElementById('app');
-    var config = { childList: true };
+var config = { childList: true };
     
 var callback = function(mutationList, observer){
     for(var mutation of mutationList){
@@ -90,19 +90,15 @@ function orderAddForm(){
             data.push(dataObj);
         });
         
-        $('#order-party').select2({
-            // theme:'bootstrap',
+        $('[name="order[party]"]').select2({
             placeholder: 'Select Party',
             data: data,
-            // tags: true,
             allowClear: true
         });
 
-        $('#order-payment_mode').select2({
-            // theme:'bootstrap',
+        $('[name="order[payment_mode]"]').select2({
             placeholder: 'Select mode of Payment',
             data: new Payment().mode,
-            // tags: true,
             allowClear: true
         });
     })
@@ -120,12 +116,6 @@ function orderAddForm(){
         });
 
         itemData = data;
-        // console.log(itemData);
-        // $('#order-item').select2({
-        //     placeholder: 'Select item',
-        //     data: itemData,
-        //     allowClear: true
-        // });
 
         let itemGroupDiv = document.getElementById('item-group');
         // let rateDiv = document.querySelector('[name="order[amount]"').parentNode.cloneNode(true);
@@ -152,36 +142,12 @@ function orderAddForm(){
         
         // itemAmountSelector.parentNode.insertBefore(itemAmountDiv, itemAmountSelector.nextSibling);
         customAddEventListener(itemGroupDiv.firstChild);
-
-        // if(document.getElementById('order-item')){
-        //     setTimeout(() => {
-        //         orderItemObserver.observe(orderItemTarget, config);
-        //     }, 2000);
-        // }
     })
-    .catch(err => console.log(err));    
+    .catch(err => console.log(err));
 
-    // var orderItemTarget = document.getElementById('item-group');    
-            
-    // var orderItemCB = function(mutationList, observer){
-    //     for(var mutation of mutationList){
-    //         if(mutation.type == 'childList') {
-    //             let elArray = document.getElementsByClassName('btn-row_add');
-    //             console.log(elArray);
-    //             elArray.forEach(element => {
-    //                 console.log(element);
-    //                 element.addEventListener('click', btnRowAddEventListener);
-    //             });
-    //         };
-    //     }
-    // };
-
-    // var orderItemObserver = new MutationObserver(orderItemCB);
-
-    $('#order-status').select2({
+    $('[name="order[status]"]').select2({
         placeholder: 'Select Status',
         data: new Order().status,
-        // tags: true,
         allowClear: true
     });
 
@@ -256,7 +222,7 @@ function orderAddForm(){
             });
             $(element).on('select2:unselect', e => {
                 let el = element.parentNode;
-                // console.log(el);
+                
                 while(el.parentNode){
                     if(el.className == 'row'){                
                         break;
@@ -279,7 +245,7 @@ function orderAddForm(){
             let itemRate = row.querySelector('[name="order[item-rate]"]').value;
             let itemQuantity = row.querySelector('[name="order[item-quantity]"]').value;
 
-            row.querySelector('[name="order[item-amount]"]').value = itemRate * itemQuantity;
+            row.querySelector('[name="order[item-amount]"]').value = parseFloat(itemRate * itemQuantity).toFixed(3);
             
             updateNetAmount();
         }
@@ -291,6 +257,7 @@ function orderAddForm(){
         itemAmmountArray.forEach(element => netAmount += parseFloat(element.value));
         document.querySelector('[name="order[amount]"').value = netAmount.toFixed(3);
     }
+    // /order module
 }
 
 function paymentAddForm(){
@@ -307,7 +274,7 @@ function paymentAddForm(){
              data.push(dataObj);
          });
          
-         $('#payment-party').select2({
+         $('[name="payment[party]"]').select2({
              // theme:'bootstrap',
              placeholder: 'Select Party',
              data: data,
@@ -315,7 +282,7 @@ function paymentAddForm(){
              allowClear: true
          });
  
-         $('#payment-payment_mode').select2({
+         $('[name="payment[payment_mode]"]').select2({
              // theme:'bootstrap',
              placeholder: 'Select mode of Payment',
              data: new Payment().mode,
@@ -346,14 +313,14 @@ function purchaseAddForm(){
             data.push(dataObj);
         });
         
-        $('#purchase-party').select2({
+        $('[name="purchase[party]"]').select2({
             placeholder: 'Select Party',
             data: data,
             // tags: true,
             allowClear: true
         });
 
-        $('#purchase-payment_mode').select2({
+        $('[name="purchase[payment_mode]"]').select2({
             placeholder: 'Select mode of Payment',
             data: new Payment().mode,
             // tags: true,
@@ -403,9 +370,9 @@ function stockAddForm(){
 function alertDocSave(modal){    
     var prefix = modal.constructor.name.toLowerCase();
     // document.getElementById(`form-${prefix}`).reset();
-    document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
+    document.querySelectorAll(`[name^=${prefix}]`).forEach((el) => {
         // let field = element.id.replace(`${prefix}`, '');
-        let el = document.getElementById(element.id);
+        // let el = document.getElementById(element.id);
         el.value = '';
         setTimeout(() => {
             el.dispatchEvent(new Event('change'));
@@ -536,13 +503,25 @@ function saveDoc(modalName){
 
 function fetchDataFromHTML(modal, err = false, reset = false){
     var doc = {};
-    var prefix = modal.constructor.name.toLowerCase() + '-';
-
-    document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
-        
-        let field = (element.id).replace(prefix, '');
-        let el = document.getElementById(element.id);
-        doc[field] = el.value;
+    var prefix = modal.constructor.name.toLowerCase() + '[';
+    // console.log(prefix);
+    document.querySelectorAll(`[name^="${prefix}"]`).forEach((el) => {
+        // console.log(element);
+        let field = (el.name).replace(prefix, '').replace(']','');
+        // let el = document.querySelector(`[name="${element.name}"]`);
+        if(modal.iterableFormFields[0].includes(field)){
+            if(!doc[modal.iterableFormFields[1]]) doc[modal.iterableFormFields[1]] = [];
+            let tempObj = doc[modal.iterableFormFields[1]].pop() || {};
+            if(!tempObj[field]){
+                tempObj[field] = el.value;
+                doc[modal.iterableFormFields[1]].push(tempObj);
+            } else {
+                doc[modal.iterableFormFields[1]].push(tempObj);
+                doc[modal.iterableFormFields[1]].push({ [field]: el.value});
+            }
+        } else {
+            doc[field] = el.value;
+        }        
         // console.log(field)
         // console.log(err[field]);
         if(err){ 
@@ -569,7 +548,7 @@ function fetchDataFromHTML(modal, err = false, reset = false){
             el.classList.remove('is-valid');
         }
     });
-
+    // console.log(doc); throw '';
     return doc;
 }
 

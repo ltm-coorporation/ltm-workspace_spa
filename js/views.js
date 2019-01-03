@@ -134,29 +134,31 @@ class Form extends viewElements{
                 this.labelTag.innerHTML = this.modal.fieldAlias[field];
                 this.divTag.appendChild(this.labelTag.cloneNode(true));     
                 
-                let tagId = `${this.modalName}-${field}`;
+                // let tagId = `${this.modalName}-${field}`;
                 let tagName = `${this.modalName}[${field}]`;
                 switch(fieldTag){
                     case 'input':{
                                     this.inputTag.setAttribute('type', fieldType);
                                     this.inputTag.setAttribute('step', fieldStep);
-                                    this.inputTag.setAttribute('id', tagId);
+                                    // this.inputTag.setAttribute('id', tagId);
                                     this.inputTag.setAttribute('name', tagName);
                                     this.inputTag.setAttribute('placeholder', `Enter ${this.modal.fieldAlias[field]}`);
                                     this.divTag.appendChild(this.inputTag.cloneNode(true));
                                 }
                                 break;
                     case 'select': {
-                                    this.selectTag.setAttribute('id', tagId);
+                                    // this.selectTag.setAttribute('id', tagId);
                                     this.selectTag.setAttribute('name', tagName);
                                     this.optionTag.setAttribute('value','');
                                     this.selectTag.appendChild(this.optionTag.cloneNode(true));
                                     this.divTag.appendChild(this.selectTag.cloneNode(true));
                                 }
                                 break;
-                    case 'textarea': this.textareaTag.setAttribute('id', tagId);
-                                     this.textareaTag.setAttribute('placeholder', `Enter ${this.modal.fieldAlias[field]}`);
-                                     this.divTag.appendChild(this.textareaTag.cloneNode(true));
+                    case 'textarea': 
+                                    // this.textareaTag.setAttribute('id', tagId);
+                                    this.textareaTag.setAttribute('name', tagName);
+                                    this.textareaTag.setAttribute('placeholder', `Enter ${this.modal.fieldAlias[field]}`);
+                                    this.divTag.appendChild(this.textareaTag.cloneNode(true));
                 }
                 // if(fieldTag == 'input')
                 

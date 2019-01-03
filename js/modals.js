@@ -183,7 +183,7 @@ class docDB {
         this.docBody._id = docToSave._id ? docToSave._id : new Date().getTime().toString();
         
         // let db = new PouchDB(uuid);
-
+        console.log(this.docBody);
         return new Promise((resolve, reject) => {
             let verfiedDoc = this.validate(this.docBody);
             if(!verfiedDoc.isValid){
@@ -242,7 +242,7 @@ class modalDoc extends docDB {
         // from child class
         this.fields.forEach(fieldArray => {
             fieldArray[0].forEach(field => {
-                keys.push(field);
+                    keys.push(field);
             });
         });
         return keys;
@@ -503,15 +503,16 @@ class Order extends modalDoc{
 
     get fields(){
         return[
-            [['party', 'item', 'invoice', 'status', 'payment_mode', 'due_date', 'notes'],'string'],
-            [['amount', 'quantity'], 'number'],
+            [['party', 'invoice', 'status', 'payment_mode', 'due_date', 'notes'],'string'],
+            [['amount', 'item', 'item-rate', 'item-quantity', 'item-amount'], 'number'],
+            [['item-details'], 'array']
         ];
     }
 
     get tableFields(){
         return ['party', 'invoice', 'amount', 'status', 'payment_mode', 'due_date']
     }
-
+     
     get formFields(){
         return [
             ['invoice', 'input'],
@@ -528,6 +529,10 @@ class Order extends modalDoc{
             ['due_date', 'input'],
             ['notes', 'textarea']
         ];
+    }
+
+    get iterableFormFields(){
+        return [['item', 'item-rate', 'item-quantity', 'item-amount'], 'item-details'];
     }
 
     get fieldAlias(){
@@ -574,25 +579,25 @@ class Order extends modalDoc{
         });
     }
     
-    save(docToSave){
-        return super.save(docToSave)
-                // .then(res => {
-                //     console.log(res);                    
-                //     return new Promise((resolve, reject) => {
-                //         let p = {};
-                //         p.party = res.party;
-                //         p.payment_mode = res.payment_mode;
-                //         p.amount = res.amount;
-                //         new Payment().save(p)
-                //         .then(doc => { 
-                //             console.log(doc);
-                //             resolve(this);
-                //         })
-                //         .catch(err => reject(err));
-                //     });
-                //     // return this;
-                // });
-    }
+    // save(docToSave){
+    //     return super.save(docToSave)
+    //             // .then(res => {
+    //             //     console.log(res);                    
+    //             //     return new Promise((resolve, reject) => {
+    //             //         let p = {};
+    //             //         p.party = res.party;
+    //             //         p.payment_mode = res.payment_mode;
+    //             //         p.amount = res.amount;
+    //             //         new Payment().save(p)
+    //             //         .then(doc => { 
+    //             //             console.log(doc);
+    //             //             resolve(this);
+    //             //         })
+    //             //         .catch(err => reject(err));
+    //             //     });
+    //             //     // return this;
+    //             // });
+    // }
 }
 
 /**
@@ -686,7 +691,7 @@ class Expense extends modalDoc{
     get formFields(){
         return [
             ['name', 'input'],
-            ['amount', 'input'],
+            ['amount', 'input', 'number', '0.002'],
             ['notes', 'textarea']
         ];
     }
