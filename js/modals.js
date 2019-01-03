@@ -36,7 +36,7 @@ class Validator{
     }
     
     is_string(){
-        return (arguments[0].match(/^[0-9a-zA-Z-\s]+$/))? true: false;
+        return (arguments[0].match(/^[0-9a-zA-Z.-\s]+$/))? true: false;
     }
     
     is_email(){       
@@ -436,9 +436,7 @@ class Stock extends modalDoc{
 
     get fields(){
         return [
-            [['name', 'price'], 'string'],
-            [['quantity', 'discount'], 'number'],
-            [['tax'], 'number']
+            [['name', 'quantity', 'price', 'discount', 'tax', 'notes'], 'string']
         ];
     }
 
@@ -449,10 +447,11 @@ class Stock extends modalDoc{
     get formFields(){
         return [
             ['name', 'input'],
-            ['quantity', 'input'],
-            ['price', 'input'],
-            ['discount', 'input'],
-            ['tax', 'input']
+            ['quantity', 'input', 'number', '0.002'],
+            ['price', 'input', 'number', '0.002'],
+            ['discount', 'input', 'number','0.002'],
+            ['tax', 'input', 'number', '0.002'],
+            ['notes', 'textarea']
         ]
     }
 
@@ -462,7 +461,8 @@ class Stock extends modalDoc{
             'quantity': 'Quantity',
             'price': "Price",
             'discount': 'Discount',
-            'tax': 'Tax'
+            'tax': 'Tax',
+            'notes': 'Notes'
         }
     }
 
@@ -518,9 +518,11 @@ class Order extends modalDoc{
             ['party', 'select'],
             [
                 ['item', 'select'],
-                ['quantity', 'input', 'number'],
-                ['amount', 'input', 'number', '0.002']
+                ['item-rate', 'input', 'number', '0.002'],    
+                ['item-quantity', 'input', 'number', '0.002'],
+                ['item-amount', 'input', 'number', '0.002'],
             ],
+            ['amount', 'input', 'number', '0.002'],
             ['payment_mode', 'select'],
             ['status', 'select'],
             ['due_date', 'input'],
@@ -533,8 +535,10 @@ class Order extends modalDoc{
             'invoice' : 'Invoice No.',
             'party' : 'Party Name',
             'item': 'Item Name',
-            'quantity': 'Quantity',            
-            'amount': 'Amount',
+            'item-rate': 'Rate',
+            'item-quantity': 'Quantity',
+            'item-amount': 'Item Amount',
+            'amount': 'Net Payable Amount',
             'net_amount': 'Net Amount',
             'payment_mode': 'Payment Mode',
             'status' : 'Status',

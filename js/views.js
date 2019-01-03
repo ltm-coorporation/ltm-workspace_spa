@@ -75,27 +75,38 @@ class Form extends viewElements{
         
         this.modal.formFields.forEach(formFieldArray => {
 
+            // if lopp here is for iterable field row in form.
             if(formFieldArray[0] instanceof Array){
                 let div = document.createElement('div');
                 div.setAttribute('class', 'row');
+                // for each col of iterable row.
                 formFieldArray.forEach(subFormFieldArray => {
                     let innerDiv = document.createElement('div');
                     innerDiv.appendChild(createFormGroup.call(this, subFormFieldArray));
                     innerDiv.setAttribute('class', 'col');
                     div.appendChild(innerDiv.cloneNode(true));
                 });
+                let btnDiv = document.createElement('div');
+                btnDiv.setAttribute('class', 'col-2');
+                btnDiv.appendChild(document.createElement('br'));
+
                 let btn = document.createElement('button');
                 btn.setAttribute('type', 'button');
-                btn.setAttribute('class', 'btn btn-primary');
-                btn.innerHTML = 'Button';
-                btn.addEventListener('click', function(){
-                    var parentDiv = this.parentNode;
-                    parentDiv.appendChild(div.cloneNode(true));
-                })
+
+                btn.setAttribute('class', 'btn btn-primary btn-row_add');
+                btn.innerHTML = 'Add';
+                btnDiv.appendChild(btn.cloneNode(true));
+
+                btn.setAttribute('class', 'btn btn-primary btn-row_delete invisible');
+                btn.innerHTML = 'Delete';                
+                btnDiv.appendChild(btn.cloneNode(true));
+
+                div.appendChild(btnDiv.cloneNode(true));
+                
                 let div2 = document.createElement('div');
                 div2.setAttribute('id', `${formFieldArray[0][0]}-group`);
                 div2.appendChild(div.cloneNode(true));
-                div2.appendChild(btn);
+                
                 this.formTag.appendChild(div2);
 
             } else {
@@ -112,28 +123,33 @@ class Form extends viewElements{
                 let fieldStep = fieldArray[3] || '';
                 let msgInValid = 'InValid';
                 this.modal.fields.forEach(fa => {
+                    // check for field in form field array.
                     if(fa[0].includes(field)){
+                        // check for custom invalid message in form field array.
                         msgInValid = fa[2] || msgInValid;
                     }
                 });
                 this.divTag.innerHTML = '';
                 this.labelTag.setAttribute('for', `${this.modalName}-${field}`)
                 this.labelTag.innerHTML = this.modal.fieldAlias[field];
-                this.divTag.appendChild(this.labelTag.cloneNode(true));            
+                this.divTag.appendChild(this.labelTag.cloneNode(true));     
                 
                 let tagId = `${this.modalName}-${field}`;
+                let tagName = `${this.modalName}[${field}]`;
                 switch(fieldTag){
                     case 'input':{
                                     this.inputTag.setAttribute('type', fieldType);
                                     this.inputTag.setAttribute('step', fieldStep);
                                     this.inputTag.setAttribute('id', tagId);
+                                    this.inputTag.setAttribute('name', tagName);
                                     this.inputTag.setAttribute('placeholder', `Enter ${this.modal.fieldAlias[field]}`);
                                     this.divTag.appendChild(this.inputTag.cloneNode(true));
                                 }
                                 break;
                     case 'select': {
                                     this.selectTag.setAttribute('id', tagId);
-                                    // this.optionTag.setAttribute('value', `${this}`);
+                                    this.selectTag.setAttribute('name', tagName);
+                                    this.optionTag.setAttribute('value','');
                                     this.selectTag.appendChild(this.optionTag.cloneNode(true));
                                     this.divTag.appendChild(this.selectTag.cloneNode(true));
                                 }
@@ -154,12 +170,23 @@ class Form extends viewElements{
                 this.divTag.appendChild(divValidation.cloneNode(true));
                 return this.divTag.cloneNode(true);
             }
+            this.resetTags();
         });
         // console.log(this.formTag);
         // this.formTag.firstElementChild.querySelectorAll('input', () => {
         //     console.log(this);
         //     this.setAttribute('autofocus','');
         // });
+        
         return this.formTag;
+    }
+
+    resetTags(){
+        this.divTag.innerHTML = '';
+        this.labelTag.innerHTML = '';
+        this.inputTag.innerHTML = '';
+        this.selectTag.innerHTML = '';
+        this.optionTag.innerHTML = '';
+        this.textareaTag.innerHTML = '';
     }
 }

@@ -78,6 +78,7 @@ function appReload(toggleNavbar = true){
 function orderAddForm(){
     // order module
     $(new Form(new Order()).view()).insertBefore('#btn-order_add');
+    
     new Party().allNameAndId()
     .then(partyNamesAndId => {
         let data = [];
@@ -106,62 +107,76 @@ function orderAddForm(){
         });
     })
     .catch(err => console.log(err));
-    // let itemData = []
-    new Stock().allNameAndId()
-    .then(stockNamesAndId => {
-        let data = [];
-        stockNamesAndId.forEach(stockNameIdObj => {
 
-            let dataObj = {};
-            dataObj.id = stockNameIdObj.id;
-            dataObj.text = stockNameIdObj.name;
-            data.push(dataObj);
+    // let itemData = []
+    new Stock().allDocs()
+    .then(stockDocs => {
+        let data = [];
+        stockDocs.forEach(stockDoc => {
+
+            stockDoc.doc.id = stockDoc.doc._id;
+            stockDoc.doc.text = stockDoc.doc.name;
+            data.push(stockDoc.doc);
         });
 
         itemData = data;
         // console.log(itemData);
-        $('#order-item').select2({
-            // theme:'bootstrap',
-            placeholder: 'Select item',
-            data: data,
-            // tags: true,
-            allowClear: true
-        });
+        // $('#order-item').select2({
+        //     placeholder: 'Select item',
+        //     data: itemData,
+        //     allowClear: true
+        // });
 
-        if(document.getElementById('order-item')){
-            setTimeout(() => {
-                orderItemObserver.observe(orderItemTarget, config);
-            }, 2000);
-        }
+        let itemGroupDiv = document.getElementById('item-group');
+        // let rateDiv = document.querySelector('[name="order[amount]"').parentNode.cloneNode(true);
+        // let rateLabel = rateDiv.querySelector('label');
+        // rateLabel.setAttribute('for','item-rate');
+        // rateLabel.innerHTML = 'Item Rate';
+        
+        // let rateInput = rateDiv.querySelector('input');
+        // rateInput.setAttribute('placeholder', 'Enter Rate');
+        // rateInput.setAttribute('name','order[rate]');
+        // // console.log(rateDiv);
+        // // console.log(itemGroupDiv.firstChild.firstChild);
+        // let itemAmountDiv = document.querySelector('[name="order[amount]"').parentNode.cloneNode(true);
+        // let itemAmountLabel = itemAmountDiv.querySelector('label');
+        // itemAmountLabel .setAttribute('for','item-amount');
+        // itemAmountLabel.innerHTML = 'Item Amount';
+        
+        // let itemAmountInput = itemAmountDiv.querySelector('input');
+        // itemAmountInput.setAttribute('placeholder', 'Enter Amount');
+        // itemAmountInput.setAttribute('name','order[item-amount]');
+
+        // itemGroupDiv.firstChild.insertBefore(rateDiv, itemGroupDiv.firstChild.firstChild.nextSibling);
+        // let itemAmountSelector = itemGroupDiv.firstChild.querySelector('[name="order[quantity]"').parentNode.parentNode;
+        
+        // itemAmountSelector.parentNode.insertBefore(itemAmountDiv, itemAmountSelector.nextSibling);
+        customAddEventListener(itemGroupDiv.firstChild);
+
+        // if(document.getElementById('order-item')){
+        //     setTimeout(() => {
+        //         orderItemObserver.observe(orderItemTarget, config);
+        //     }, 2000);
+        // }
     })
     .catch(err => console.log(err));    
 
-    var orderItemTarget = document.getElementById('item-group');    
+    // var orderItemTarget = document.getElementById('item-group');    
             
-    var orderItemCB = function(mutationList, observer){
-        for(var mutation of mutationList){
-            if(mutation.type == 'childList') {
-                $('#order-item').select2({           
-                    placeholder: 'Select item',
-                    data: itemData,
-                    allowClear: true
-                });
-            };
-        }
-    };
+    // var orderItemCB = function(mutationList, observer){
+    //     for(var mutation of mutationList){
+    //         if(mutation.type == 'childList') {
+    //             let elArray = document.getElementsByClassName('btn-row_add');
+    //             console.log(elArray);
+    //             elArray.forEach(element => {
+    //                 console.log(element);
+    //                 element.addEventListener('click', btnRowAddEventListener);
+    //             });
+    //         };
+    //     }
+    // };
 
-    var orderItemObserver = new MutationObserver(orderItemCB);
-    
-    
-    // $("body").on('DOMSubtreeModified', ".item-group", function() {
-    //     $('#order-item').select2({
-    //         // theme:'bootstrap',
-    //         placeholder: 'Select item',
-    //         data: itemData,
-    //         // tags: true,
-    //         allowClear: true
-    //     });
-    // });
+    // var orderItemObserver = new MutationObserver(orderItemCB);
 
     $('#order-status').select2({
         placeholder: 'Select Status',
@@ -174,7 +189,108 @@ function orderAddForm(){
         e.preventDefault();
         saveDoc('Order');
     });
-    // / order module
+
+    function addItemRow(e){
+        
+        let el = e.target.parentNode;
+        while(el.parentNode){
+            if(el.className == 'row'){                
+                break;
+            }
+            el = el.parentNode;
+        }
+        // let btnRowDelete
+        // el.getElementsByClassName('btn-row_delete')[0].classList.remove('invisible');
+        let row = el.cloneNode(true);        
+
+        customAddEventListener(row);        
+
+        let btnRowDelete = row.getElementsByClassName('btn-row_delete')[0];
+        btnRowDelete.classList.remove('invisible');
+        btnRowDelete.addEventListener('click', (e) => {
+            let el = e.target.parentNode;
+            while(el.parentNode){
+                if(el.className == 'row'){                
+                    break;
+                }
+                el = el.parentNode;
+            };
+            el.parentNode.removeChild(el);
+            updateNetAmount();
+        });
+
+        el.parentNode.insertBefore(row, el.nextSibling);
+    }
+
+    function customAddEventListener(row){
+
+        Array.from(row.getElementsByTagName('input')).forEach(element => {
+            element.value = '';
+        });
+        
+        Array.from(row.getElementsByTagName('select')).forEach(element => {
+            element.classList.remove('select2-hidden-accessible');
+            let select2Container = element.parentNode.getElementsByClassName('select2-container')[0];
+            
+            if(select2Container) select2Container.parentNode.removeChild(select2Container);
+            $(element).select2({
+                placeholder: 'Select item',
+                data: itemData,
+                allowClear: true
+            });
+            $(element).on('select2:select', e => {
+                let el = element.parentNode;
+                // console.log(el);
+                while(el.parentNode){
+                    if(el.className == 'row'){                
+                        break;
+                    }
+                    el = el.parentNode;
+                };                
+                
+                let rate = e.params.data.price;
+                let defaultQuantity = 1;
+                el.querySelector('[name="order[item-rate]"]').value = rate;                
+                el.querySelector('[name="order[item-quantity]"').value = defaultQuantity;
+                el.querySelector('[name="order[item-rate]"]').dispatchEvent(new Event('change'));
+            });
+            $(element).on('select2:unselect', e => {
+                let el = element.parentNode;
+                // console.log(el);
+                while(el.parentNode){
+                    if(el.className == 'row'){                
+                        break;
+                    }
+                    el = el.parentNode;
+                };                
+                
+                el.querySelector('[name="order[item-rate]"]').value = '';
+                el.querySelector('[name="order[item-quantity]"').value = '';
+                el.querySelector('[name="order[item-rate]"]').dispatchEvent(new Event('change'));
+            });
+        });
+
+        row.querySelector('[name="order[item-rate]"]').addEventListener('change', updateItemAmount);
+        row.querySelector('[name="order[item-quantity]"]').addEventListener('change', updateItemAmount);
+        row.querySelector('[name="order[item-amount]"]').addEventListener('change', updateNetAmount);
+        row.getElementsByClassName('btn-row_add')[0].addEventListener('click', addItemRow);
+
+        function updateItemAmount(e){
+            let itemRate = row.querySelector('[name="order[item-rate]"]').value;
+            let itemQuantity = row.querySelector('[name="order[item-quantity]"]').value;
+
+            row.querySelector('[name="order[item-amount]"]').value = itemRate * itemQuantity;
+            
+            updateNetAmount();
+        }
+    }
+
+    function updateNetAmount(){
+        let itemAmmountArray = document.getElementsByName('order[item-amount]');
+        let netAmount = 0;
+        itemAmmountArray.forEach(element => netAmount += parseFloat(element.value));
+        document.querySelector('[name="order[amount]"').value = netAmount.toFixed(3);
+    }
 }
 
 function paymentAddForm(){
