@@ -557,9 +557,13 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         if(reset){
             el.classList.remove('is-invalid');
             el.classList.remove('is-valid');
+            if(el.nodeName == 'SELECT'){
+                el.parentElement.querySelector('.select2-selection').classList.remove('is-invalid');
+                el.parentElement.querySelector('.select2-selection').classList.remove('is-valid');
+            }
         }
     });
-    // console.log(doc); throw '';
+    
     return doc;
 }
 
