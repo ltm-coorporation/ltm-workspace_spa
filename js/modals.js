@@ -28,10 +28,12 @@ class Common{
 class Validator{
 
     is_float(){
+        if(this.is_number(arguments[0])) return true;
         return (arguments[0].match(/\-?\d+\.\d+$/))? true: false;
     }
 
     is_number(){
+        if(arguments[0] == 0) return false;
         return (arguments[0].match(/^[0-9]+$/))? true: false;
     }
     
@@ -68,8 +70,36 @@ class Validator{
 
                     validDoc[field] = {};
                     validDoc[field].value = doc[field];
+                    
                     let valuetype = fields[1];
                     validDoc[field].isValid = this[`is_${valuetype}`](doc[field]);
+
+                    if(valuetype == 'iterable'){
+                        // console.log(validDoc[field].value);
+                        validDoc[field].value = [];
+                        doc[field].forEach(subField => {
+                            let tempObj = {};
+                            Object.keys(subField).forEach(key => {
+                                console.log(subField[key]);
+                                let vType = '';
+                                fieldsArray.forEach(fields => {
+                                    fields[0].forEach(field => {
+                                        if(field == key){
+                                            vType = fields[1];
+                                        }
+                                    });
+                                });
+                                tempObj[key] = {}
+                                tempObj[key].value = subField[key];
+                                tempObj[key].isValid = this[`is_${vType}`](subField[key]);
+                                if(!tempObj[key].isValid){
+                                    validDoc.isValid = false;
+                                    validDoc[field].isValid = false;
+                                }
+                            });
+                            validDoc[field].value.push(tempObj);
+                        });                        
+                    }                    
                     
                     if(!validDoc[field].isValid){
                         validDoc.isValid = false;
@@ -513,7 +543,8 @@ class Order extends modalDoc{
     get fields(){
         return[
             [['party', 'invoice', 'status', 'payment_mode', 'due_date', 'notes'],'string'],
-            [['amount', 'item', 'item-rate', 'item-quantity', 'item-amount'], 'number'],
+            [['item'], 'number'],
+            [['amount', 'item-rate', 'item-quantity', 'item-amount'], 'float'],
             [['item-details'], 'iterable']
         ];
     }
@@ -621,7 +652,8 @@ class Purchase extends modalDoc{
     get fields(){
         return [
             [['party', 'payment_mode', 'notes'], 'string'],
-            [['amount', 'invoice'], 'number']
+            [['invoice'], 'number'],
+            [['amount'], 'float']
         ];
     }
 

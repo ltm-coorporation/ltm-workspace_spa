@@ -534,7 +534,9 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         // console.log(field)
         // console.log(err[field]);
         if(err){ 
-            console.log(err);
+            // console.log(err);
+            // console.log(field);
+            if(modal.iterableFields[0].includes(field)) return;
             if(!err[field].isValid){
                 el.classList.remove('is-valid');
                 el.classList.add('is-invalid');
