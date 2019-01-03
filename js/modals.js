@@ -54,7 +54,11 @@ class Validator{
         return (arguments[0].match(phoneno))? true: false;           
     }
 
-    validate(doc, fieldsArray){
+    is_iterable(){
+        return true;
+    }
+
+    validate(doc, fieldsArray, iterableFields){
         
         let validDoc = {};
         validDoc.isValid = true;
@@ -166,7 +170,7 @@ class docDB {
      */
     validate(doc){
         let v = new Validator();
-        return  v.validate(doc, this.fields);
+        return  v.validate(doc, this.fields, this.iterableFields);
     }
 
     /**
@@ -183,7 +187,7 @@ class docDB {
         this.docBody._id = docToSave._id ? docToSave._id : new Date().getTime().toString();
         
         // let db = new PouchDB(uuid);
-        console.log(this.docBody);
+        // console.log(this.docBody);
         return new Promise((resolve, reject) => {
             let verfiedDoc = this.validate(this.docBody);
             if(!verfiedDoc.isValid){
@@ -242,12 +246,17 @@ class modalDoc extends docDB {
         // from child class
         this.fields.forEach(fieldArray => {
             fieldArray[0].forEach(field => {
-                    keys.push(field);
+                    if(!this.iterableFields[0].includes(field)){                        
+                        return keys.push(field);
+                    }
+                    // console.log(field);
             });
         });
+        console.log(keys);
         return keys;
     }
 
+    get iterableFields(){ return [[],'']; }
     // get(docId){
     //     return super.get(docId);
     // }
@@ -259,7 +268,7 @@ class modalDoc extends docDB {
                 .then((res) => {
                     this.body._id = res.id;
                     this.body._rev = res.rev;
-                    return this;
+                    return this.body;
                 });
     }
 }
@@ -505,12 +514,12 @@ class Order extends modalDoc{
         return[
             [['party', 'invoice', 'status', 'payment_mode', 'due_date', 'notes'],'string'],
             [['amount', 'item', 'item-rate', 'item-quantity', 'item-amount'], 'number'],
-            [['item-details'], 'array']
+            [['item-details'], 'iterable']
         ];
     }
 
-    get tableFields(){
-        return ['party', 'invoice', 'amount', 'status', 'payment_mode', 'due_date']
+    get iterableFields(){
+        return [['item', 'item-rate', 'item-quantity', 'item-amount'], 'item-details'];
     }
      
     get formFields(){
@@ -531,9 +540,9 @@ class Order extends modalDoc{
         ];
     }
 
-    get iterableFormFields(){
-        return [['item', 'item-rate', 'item-quantity', 'item-amount'], 'item-details'];
-    }
+    get tableFields(){
+        return ['party', 'invoice', 'amount', 'status', 'payment_mode', 'due_date']
+    }    
 
     get fieldAlias(){
         return {

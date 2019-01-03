@@ -254,7 +254,13 @@ function orderAddForm(){
     function updateNetAmount(){
         let itemAmmountArray = document.getElementsByName('order[item-amount]');
         let netAmount = 0;
-        itemAmmountArray.forEach(element => netAmount += parseFloat(element.value));
+        itemAmmountArray.forEach(element => {
+            let value = 0;
+            if(element){
+                value = parseFloat(element.value);
+            }
+            netAmount += value;
+        });
         document.querySelector('[name="order[amount]"').value = netAmount.toFixed(3);
     }
     // /order module
@@ -373,7 +379,7 @@ function alertDocSave(modal){
     document.querySelectorAll(`[name^=${prefix}]`).forEach((el) => {
         // let field = element.id.replace(`${prefix}`, '');
         // let el = document.getElementById(element.id);
-        el.value = '';
+        setTimeout(() => {el.value = ''}, 30);
         setTimeout(() => {
             el.dispatchEvent(new Event('change'));
         }, 30); 
@@ -444,14 +450,14 @@ function editDocument(editDoc){
     let docType = editDoc.type;
     let modalName = docType.charAt(0).toUpperCase()+ docType.slice(1);
     let modal = new classMapping[modalName];
-    let prefix = modal.constructor.name.toLowerCase() + '-';
+    let prefix = modal.constructor.name.toLowerCase() + '[';
     
     modal.get(editDoc._id)
     .then((doc) => {
         // console.log(doc);
-        document.querySelectorAll(`[id^=${prefix}]`).forEach((element) => {
-            let field = element.id.replace(`${prefix}`, '');
-            let el = document.getElementById(element.id);
+        document.querySelectorAll(`[name^="${prefix}"]`).forEach((el) => {
+            let field = (el.name).replace(`${prefix}`, '').replace(']','');
+            // let el = document.getElementById(element.id);
             el.value = doc[field];
             setTimeout(() => {
                 el.dispatchEvent(new Event('change'));
@@ -494,7 +500,10 @@ function updateDoc(modal, editDoc){
 function saveDoc(modalName){
     let modal = new classMapping[modalName];
     modal.save(fetchDataFromHTML(modal))
-    .then((res) => alertDocSave(modal))
+    .then((res) => {
+        console.log(res);
+        alertDocSave(modal);
+    })
     .catch(err => {
         console.log(err)
         fetchDataFromHTML(modal, err);
@@ -509,15 +518,15 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         // console.log(element);
         let field = (el.name).replace(prefix, '').replace(']','');
         // let el = document.querySelector(`[name="${element.name}"]`);
-        if(modal.iterableFormFields[0].includes(field)){
-            if(!doc[modal.iterableFormFields[1]]) doc[modal.iterableFormFields[1]] = [];
-            let tempObj = doc[modal.iterableFormFields[1]].pop() || {};
+        if(modal.iterableFields[0].includes(field)){
+            if(!doc[modal.iterableFields[1]]) doc[modal.iterableFields[1]] = [];
+            let tempObj = doc[modal.iterableFields[1]].pop() || {};
             if(!tempObj[field]){
                 tempObj[field] = el.value;
-                doc[modal.iterableFormFields[1]].push(tempObj);
+                doc[modal.iterableFields[1]].push(tempObj);
             } else {
-                doc[modal.iterableFormFields[1]].push(tempObj);
-                doc[modal.iterableFormFields[1]].push({ [field]: el.value});
+                doc[modal.iterableFields[1]].push(tempObj);
+                doc[modal.iterableFields[1]].push({ [field]: el.value});
             }
         } else {
             doc[field] = el.value;
