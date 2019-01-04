@@ -501,6 +501,29 @@ function saveDoc(modalName){
     let modal = new classMapping[modalName];
     modal.save(fetchDataFromHTML(modal))
     .then((res) => {
+        
+        switch(modalName){
+            case 'Order': {
+                    let doc = {}
+                    
+                    doc.amount = res.amount;
+                    doc.party = res.party;
+                    doc.notes = 'For Invoice No. ' + res.invoice;
+                    if(res.payment_mode != 'credit'){
+                        doc.payment_mode = 'credit';
+                        return new Payment().save(doc).then(_ => {
+                            doc.payment_mode = res.payment_mode;
+                            return new Payment().save(doc);
+                        });
+                    } else {
+                        doc.payment_mode = res.payment_mode;
+                        return new Payment().save(doc);
+                    }
+            }
+            default: return res;
+        }
+    })
+    .then(res => {
         console.log(res);
         alertDocSave(modal);
     })
@@ -534,8 +557,8 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         // console.log(field)
         // console.log(err[field]);
         if(err){ 
-            // console.log(err);
-            // console.log(field);
+            console.log(err);
+            console.log(field);
             if(modal.iterableFields[0].includes(field)) return;
             if(!err[field].isValid){
                 el.classList.remove('is-valid');
@@ -563,7 +586,7 @@ function fetchDataFromHTML(modal, err = false, reset = false){
             }
         }
     });
-    
+    console.log(doc);
     return doc;
 }
 

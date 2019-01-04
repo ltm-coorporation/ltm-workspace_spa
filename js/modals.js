@@ -80,7 +80,7 @@ class Validator{
                         doc[field].forEach(subField => {
                             let tempObj = {};
                             Object.keys(subField).forEach(key => {
-                                console.log(subField[key]);
+                                // console.log(subField[key]);
                                 let vType = '';
                                 fieldsArray.forEach(fields => {
                                     fields[0].forEach(field => {
@@ -424,7 +424,7 @@ class Payment extends modalDoc{
     get fieldAlias(){
         return {
             'party': 'Party Name',
-            'payment_mode': 'Payment Mode',
+            'payment_mode': 'Payment Type',
             'amount': 'Amount',
             'notes': 'Notes'
         }
