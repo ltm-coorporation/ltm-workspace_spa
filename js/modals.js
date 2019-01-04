@@ -619,6 +619,27 @@ class Order extends modalDoc{
         });
     }
     
+    save(docToSave){
+        return super.save(docToSave).then(res => {
+                let doc = {}
+                
+                doc.amount = res.amount;
+                doc.party = res.party;
+                doc.notes = 'For Invoice No. ' + res.invoice;
+                if(res.payment_mode != 'credit'){
+                    doc.payment_mode = 'credit';
+                    return new Payment().save(doc).then(_ => {
+                        doc.payment_mode = res.payment_mode;
+                        new Payment().save(doc);                                
+                    });
+                } else {
+                    doc.payment_mode = res.payment_mode;
+                    new Payment().save(doc);
+                }
+
+                return res;
+            });
+    }
     // save(docToSave){
     //     return super.save(docToSave)
     //             // .then(res => {

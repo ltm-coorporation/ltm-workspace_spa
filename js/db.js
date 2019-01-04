@@ -500,29 +500,6 @@ function updateDoc(modal, editDoc){
 function saveDoc(modalName){
     let modal = new classMapping[modalName];
     modal.save(fetchDataFromHTML(modal))
-    .then((res) => {
-        
-        switch(modalName){
-            case 'Order': {
-                    let doc = {}
-                    
-                    doc.amount = res.amount;
-                    doc.party = res.party;
-                    doc.notes = 'For Invoice No. ' + res.invoice;
-                    if(res.payment_mode != 'credit'){
-                        doc.payment_mode = 'credit';
-                        return new Payment().save(doc).then(_ => {
-                            doc.payment_mode = res.payment_mode;
-                            return new Payment().save(doc);
-                        });
-                    } else {
-                        doc.payment_mode = res.payment_mode;
-                        return new Payment().save(doc);
-                    }
-            }
-            default: return res;
-        }
-    })
     .then(res => {
         console.log(res);
         alertDocSave(modal);
