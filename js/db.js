@@ -514,19 +514,47 @@ function fetchDataFromHTML(modal, err = false, reset = false){
     var doc = {};
     var prefix = modal.constructor.name.toLowerCase() + '[';
     // console.log(prefix);
+    // console.log(err)
     document.querySelectorAll(`[name^="${prefix}"]`).forEach((el) => {
-        // console.log(element);
+        
         let field = (el.name).replace(prefix, '').replace(']','');
-        // let el = document.querySelector(`[name="${element.name}"]`);
+        
+        // if(!err)console.log(field);
         if(modal.iterableFields[0].includes(field)){
             if(!doc[modal.iterableFields[1]]) doc[modal.iterableFields[1]] = [];
-            let tempObj = doc[modal.iterableFields[1]].pop() || {};
-            if(!tempObj[field]){
+            let tempObj = doc[modal.iterableFields[1]].pop() || {};            
+            
+            if(tempObj[field] == null){
                 tempObj[field] = el.value;
                 doc[modal.iterableFields[1]].push(tempObj);
             } else {
-                doc[modal.iterableFields[1]].push(tempObj);
+                doc[modal.iterableFields[1]].push(tempObj);                
                 doc[modal.iterableFields[1]].push({ [field]: el.value});
+            }
+            if(err) {
+                let iterableFieldTag = modal.iterableFields[1];
+                let iterableObj = err[iterableFieldTag].value.shift() || {};
+                // console.log(field);
+                // console.log(iterableObj);
+                if(!iterableObj[field].isValid) {
+                    el.classList.remove('is-valid');
+                    el.classList.add('is-invalid');
+                    if(el.nodeName == 'SELECT'){
+                        el.parentElement.querySelector('.select2-selection').classList.remove('is-valid');
+                        el.parentElement.querySelector('.select2-selection').classList.add('is-invalid');
+                    }
+                } else {
+                    el.classList.remove('is-invalid');
+                    el.classList.add('is-valid');
+                    if(el.nodeName == 'SELECT'){
+                        el.parentElement.querySelector('.select2-selection').classList.remove('is-invalid');
+                        el.parentElement.querySelector('.select2-selection').classList.add('is-valid');
+                    }
+                }
+                delete iterableObj[field];
+                if (Object.keys(iterableObj).length){
+                    err[iterableFieldTag].value.unshift(iterableObj);
+                }
             }
         } else {
             doc[field] = el.value;
@@ -534,8 +562,8 @@ function fetchDataFromHTML(modal, err = false, reset = false){
         // console.log(field)
         // console.log(err[field]);
         if(err){ 
-            console.log(err);
-            console.log(field);
+            // console.log(err);
+            // console.log(field);
             if(modal.iterableFields[0].includes(field)) return;
             if(!err[field].isValid){
                 el.classList.remove('is-valid');
@@ -563,7 +591,7 @@ function fetchDataFromHTML(modal, err = false, reset = false){
             }
         }
     });
-    console.log(doc);
+    // console.log(doc);
     return doc;
 }
 

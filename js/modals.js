@@ -404,7 +404,7 @@ class Payment extends modalDoc{
     get fields(){
         return [
             [['party', 'notes', 'payment_mode'], 'string'],
-            [['amount'], 'number']
+            [['amount'], 'float']
         ];
     }
 
