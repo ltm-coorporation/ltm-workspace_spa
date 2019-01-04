@@ -2,7 +2,7 @@
 if('serviceWorker' in navigator) {
     navigator.serviceWorker
            .register('/sw.js')
-           .then(function() { console.log("Service Worker Registered"); })
+        //    .then(function() { console.log("Service Worker Registered"); })
            .catch(err => console.log(err));
 }
 
@@ -26,7 +26,7 @@ self.addEventListener('install', function(event) {
                 "/bower_components/pouchdb/dist/pouchdb.min.js" ,
                 "/bower_components/pouchdb/dist/pouchdb.find.min.js" ,
                 "/",
-                "/sw.js",
+                // "/sw.js",
                 "/js/config.js" ,
                 "/js/views.js" ,
                 "/js/app.js" ,
@@ -42,14 +42,8 @@ self.addEventListener('fetch', function(event) {
     self.skipWaiting();
 // console.log(event.request);
     event.respondWith(
-        fetch(event.request).catch(function() {
-            // switch(event.request.url){
-            //     case 'http://localhost:5984/uuid': return;
-            // }
-        return caches.match(event.request)
-            // .then(function(response) {
-            //     return response || fetch(event.request);
-            // });
+        caches.match(event.request).then(function(response) {
+            return response || fetch(event.request);
         })
     );
 });

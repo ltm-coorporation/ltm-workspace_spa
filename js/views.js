@@ -83,21 +83,21 @@ class Form extends viewElements{
                 formFieldArray.forEach(subFormFieldArray => {
                     let innerDiv = document.createElement('div');
                     innerDiv.appendChild(createFormGroup.call(this, subFormFieldArray));
-                    innerDiv.setAttribute('class', 'col');
+                    innerDiv.setAttribute('class', 'col col-sm-12');
                     div.appendChild(innerDiv.cloneNode(true));
                 });
                 let btnDiv = document.createElement('div');
-                btnDiv.setAttribute('class', 'col-2');
+                btnDiv.setAttribute('class', 'col-2 col-sm-12');
                 btnDiv.appendChild(document.createElement('br'));
 
                 let btn = document.createElement('button');
                 btn.setAttribute('type', 'button');
 
-                btn.setAttribute('class', 'btn btn-primary btn-row_add');
+                btn.setAttribute('class', 'btn btn-primary btn-row_add col-sm-6');
                 btn.innerHTML = 'Add';
                 btnDiv.appendChild(btn.cloneNode(true));
 
-                btn.setAttribute('class', 'btn btn-primary btn-row_delete invisible');
+                btn.setAttribute('class', 'btn btn-primary btn-row_delete col-sm-6 invisible');
                 btn.innerHTML = 'Delete';                
                 btnDiv.appendChild(btn.cloneNode(true));
 
