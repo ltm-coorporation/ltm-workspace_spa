@@ -83,7 +83,7 @@ class Form extends viewElements{
                 formFieldArray.forEach(subFormFieldArray => {
                     let innerDiv = document.createElement('div');
                     innerDiv.appendChild(createFormGroup.call(this, subFormFieldArray));
-                    innerDiv.setAttribute('class', 'col col-sm-12');
+                    innerDiv.setAttribute('class', 'col');
                     div.appendChild(innerDiv.cloneNode(true));
                 });
                 let btnDiv = document.createElement('div');
