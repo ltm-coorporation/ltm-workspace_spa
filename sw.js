@@ -39,24 +39,25 @@ self.addEventListener('install', function(event) {
                 // console.log('adding');
                 return cache.addAll(
                     [
-                    // "/bower_components/bootstrap/dist/css/bootstrap.min.css",
-                    // "/bower_components/select2/dist/css/select2.min.css",
-                    // "/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.min.css",
-                    // "/bower_components/jquery/dist/jquery.slim.min.js",
-                    // "/bower_components/popper.js/dist/umd/popper.min.js",
-                    // "/bower_components/bootstrap/dist/js/bootstrap.min.js" ,
-                    // "/bower_components/select2/dist/js/select2.min.js" ,
-                    // "/bower_components/handlebars/handlebars.min.js" ,
-                    // "/bower_components/vanilla-router/dist/vanilla-router.min.js" ,
-                    // "/bower_components/pouchdb/dist/pouchdb.min.js" ,
-                    // "/bower_components/pouchdb/dist/pouchdb.find.min.js" ,
+                    "/bower_components/bootstrap/dist/css/bootstrap.min.css",
+                    "/bower_components/select2/dist/css/select2.min.css",
+                    "/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.min.css",
+                    "/bower_components/jquery/dist/jquery.slim.min.js",
+                    "/bower_components/popper.js/dist/umd/popper.min.js",
+                    "/bower_components/bootstrap/dist/js/bootstrap.min.js" ,
+                    "/bower_components/select2/dist/js/select2.min.js" ,
+                    "/bower_components/handlebars/handlebars.min.js" ,
+                    "/bower_components/vanilla-router/dist/vanilla-router.min.js" ,
+                    "/bower_components/pouchdb/dist/pouchdb.min.js" ,
+                    "/bower_components/pouchdb/dist/pouchdb.find.min.js" ,
                     "/",
-                    // "/sw.js",
-                    // "/js/config.js" ,
-                    // "/js/views.js" ,
-                    // "/js/app.js" ,
-                    // "/js/modals.js" ,
-                    // "/js/db.js" ,
+                    "/sw.js",
+                    "/js/config.js" ,
+                    "/js/views.js" ,
+                    "/js/app.js" ,
+                    "/js/modals.js" ,
+                    "/js/handlers.js",
+                    "/js/db.js" ,
                     ]
                 );
             })
@@ -109,4 +110,4 @@ self.addEventListener('fetch', function(event) {
 //       .then(res => window.location.reload)
 //     );
 //   });
-let version = 0.0013;
+let version = 0.014;

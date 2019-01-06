@@ -128,16 +128,18 @@ class docDB {
      */
 
     allDocs(){        
-        return new Promise((resolve, reject) => {
-            db.find({
-                selector:{ type: this.docBody.type},
-                sort: [{'_id': 'desc'}]
-            }).then((result) => {
-                let docs = [];
-                result.docs.forEach(doc => docs.push({doc}));
-                resolve(docs);
-            }).catch(err => reject(err));
-        });        
+        // return new Promise((resolve, reject) => {
+        return db.find({
+                    selector:{ type: this.docBody.type},
+                    sort: [{'_id': 'desc'}]
+                }).then((result) => {
+                    let docs = [];
+                    result.docs.forEach(doc => docs.push({doc}));
+                    // console.log(docs);
+                    return docs;
+                    // resolve(docs);
+                });
+            // .catch(err => reject(err));
     }
 
     /**
@@ -282,7 +284,7 @@ class modalDoc extends docDB {
                     // console.log(field);
             });
         });
-        console.log(keys);
+        // console.log(keys);
         return keys;
     }
 
@@ -591,33 +593,34 @@ class Order extends modalDoc{
             'notes': 'Notes'
         }
     }
-
+    
     allDocs(){
-        return new Promise((resolve, reject) => {
-            super.allDocs()
-            .then(docArray => {
-                return new Common().getKeyById(docArray, new Party(), 'name');
-                // let p = [];
+        // return new Promise((resolve, reject) => {
+        return  super.allDocs()
+                .then(docArray => {
+                    return new Common().getKeyById(docArray, new Party(), 'name');
+                    // let p = [];
 
-                // docArray.forEach(docObj => {
-                //     let partyId = docObj.doc.party; 
-                //     p.push(
-                //         new Promise((reso, rej) => {
-                //             return new Party().getNameById(partyId)
-                //                     .then(partyName => {
-                //                         docObj.doc.party = partyName;
-                //                     })
-                //                     .then(_ => reso());
-                //     }));
-                // });
+                    // docArray.forEach(docObj => {
+                    //     let partyId = docObj.doc.party; 
+                    //     p.push(
+                    //         new Promise((reso, rej) => {
+                    //             return new Party().getNameById(partyId)
+                    //                     .then(partyName => {
+                    //                         docObj.doc.party = partyName;
+                    //                     })
+                    //                     .then(_ => reso());
+                    //     }));
+                    // });
 
-                // return Promise.all(p)
-                //       .then(_ => docArray);           
-            })
-            .then(res => resolve(res))
-            .catch(err => reject(err));
-        });
-    }
+                    // return Promise.all(p)
+                    //       .then(_ => docArray);           
+                })
+                .then(res => console.log(res))
+                .catch(err => err);
+                // .then(res => resolve(res))
+                // .catch(err => reject(err));
+    }    
     
     save(docToSave){
         return super.save(docToSave).then(res => {
