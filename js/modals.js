@@ -595,8 +595,8 @@ class Order extends modalDoc{
     }
     
     allDocs(){
-        // return new Promise((resolve, reject) => {
-        return  super.allDocs()
+        return new Promise((resolve, reject) => {
+            super.allDocs()
                 .then(docArray => {
                     return new Common().getKeyById(docArray, new Party(), 'name');
                     // let p = [];
@@ -616,11 +616,12 @@ class Order extends modalDoc{
                     // return Promise.all(p)
                     //       .then(_ => docArray);           
                 })
-                .then(res => console.log(res))
-                .catch(err => err);
-                // .then(res => resolve(res))
-                // .catch(err => reject(err));
-    }    
+                // .then(res => console.log(res))
+                // .catch(err => err);
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
     
     save(docToSave){
         return super.save(docToSave).then(res => {
