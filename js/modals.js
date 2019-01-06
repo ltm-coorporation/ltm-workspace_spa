@@ -231,7 +231,7 @@ class docDB {
                 
                 //deleting docBody makes it only in parent class.
                 // also improves performance in large object.
-                delete this.docBody;
+                // delete this.docBody;
                 return resolve(result);
             });
         });
@@ -300,7 +300,9 @@ class modalDoc extends docDB {
                 .then((res) => {
                     this.body._id = res.id;
                     this.body._rev = res.rev;
-                    return this.body;
+
+                    // console.log(this.body);
+                    return super.get(res.id);
                 });
     }
 }
