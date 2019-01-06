@@ -137,10 +137,13 @@ function updateDoc(modal, editDoc){
     .then((result) => {
         doc._id = result._id;
         doc._rev = result._rev;
+        Object.keys(result).forEach(key  => {
+            (doc[key] == null) ? doc[key] = result[key]: '';
+        });
         return modal.save(doc);        
     })
     .then((res) => {
-        alertDocSave(modal);
+        // alertDocSave(modal);
         let ltmObj = new ltm();
         ltmObj.navigateTo(editDoc.type);
     })
