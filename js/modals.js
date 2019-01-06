@@ -624,26 +624,63 @@ class Order extends modalDoc{
     }
     
     save(docToSave){
-        return super.save(docToSave).then(res => {
-                let doc = {}
-                
-                doc.amount = res.amount;
-                doc.party = res.party;
-                doc.notes = 'For Invoice No. ' + res.invoice;
-                if(res.payment_mode != 'credit'){
-                    doc.payment_mode = 'credit';
-                    return new Payment().save(doc).then(_ => {
-                        doc.payment_mode = res.payment_mode;
-                        new Payment().save(doc);                                
-                    });
-                } else {
-                    doc.payment_mode = res.payment_mode;
-                    new Payment().save(doc);
-                }
 
-                return res;
-            });
+        let doc = {};
+                
+        doc.amount = docToSave.amount;
+        doc.party = docToSave.party;
+        doc.notes = 'For Invoice No. ' + docToSave.invoice;
+        
+        docToSave.paymentIds = [];
+        
+        if(docToSave.payment_mode != 'credit'){
+            doc.payment_mode = 'credit';
+            
+            return new Payment().save(doc)
+                .then(res => {
+                    docToSave.paymentIds.push(res._id);
+                    doc.payment_mode = docToSave.payment_mode;
+                    return doc;                
+                })
+                .then(res => {
+                    return new Payment().save(res);
+                })
+                .then(res => {
+                    docToSave.paymentIds.push(res._id);
+                    return super.save(docToSave);
+                })
+            // .then(result => result);
+        } else {
+            doc.payment_mode = docToSave.payment_mode;
+            return new Payment().save(doc)
+                .then(res => {
+                    docToSave.paymentIds.push(res._id);
+                    return super.save(docToSave);
+                })
+        }
+
     }
+    // save(docToSave){
+    //     return super.save(docToSave).then(res => {
+    //             let doc = {}
+                
+    //             doc.amount = res.amount;
+    //             doc.party = res.party;
+    //             doc.notes = 'For Invoice No. ' + res.invoice;
+    //             if(res.payment_mode != 'credit'){
+    //                 doc.payment_mode = 'credit';
+    //                 return new Payment().save(doc).then(_ => {
+    //                     doc.payment_mode = res.payment_mode;
+    //                     new Payment().save(doc);                                
+    //                 });
+    //             } else {
+    //                 doc.payment_mode = res.payment_mode;
+    //                 new Payment().save(doc);
+    //             }
+
+    //             return res;
+    //         });
+    // }
     // save(docToSave){
     //     return super.save(docToSave)
     //             // .then(res => {

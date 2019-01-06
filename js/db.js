@@ -85,11 +85,33 @@ function editDocument(editDoc){
     modal.get(editDoc._id)
     .then((doc) => {
         console.log(doc);
+        let iterableField = (modal.iterableFields[0].length) ? modal.iterableFields[1] : null;
+        let iterableElementsCount;
+        if(iterableField){
+            // iterableElementsCount = 
+            let el  = document.getElementsByClassName('btn-row_add');
+            for(let i = 0; i < doc[iterableField].length-1; i++){
+                el[0].dispatchEvent(new Event('click'));
+            }
+            
+        }
         document.querySelectorAll(`[name^="${prefix}"]`).forEach((el) => {
             
             let field = (el.name).replace(`${prefix}`, '').replace(']','');
-            console.log(doc[field]);
-            el.value = doc[field];
+            // console.log(doc[field]);
+            if(!modal.iterableFields[0].includes(field)){
+                el.value = doc[field];
+            } else {
+                // console.log(doc[iterableField]);
+                let iterableDoc = doc[iterableField].shift();
+                el.value = iterableDoc[field];
+                delete iterableDoc[field];
+                if(Object.keys(iterableDoc).length){
+                    doc[iterableField].unshift(iterableDoc);
+                }                
+                // console.log(field);
+            }
+            
             setTimeout(() => {
                 el.dispatchEvent(new Event('change'));
             }, 30); 
