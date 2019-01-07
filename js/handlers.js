@@ -373,7 +373,7 @@ function fetchDataFromHTML(modal, err = false, reset = false){
     var doc = {};
     var prefix = modal.constructor.name.toLowerCase() + '[';
     // console.log(prefix);
-    // console.log(err)
+    console.log(err)
     document.querySelectorAll(`[name^="${prefix}"]`).forEach((el) => {
         
         let field = (el.name).replace(prefix, '').replace(']','');

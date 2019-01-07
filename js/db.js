@@ -158,6 +158,7 @@ function saveDoc(modalName){
     modal.save(fetchDataFromHTML(modal))
     .then(res => {
         console.log(res);
+        console.log(modal);
         alertDocSave(modal);
     })
     .catch(err => {

@@ -33,7 +33,7 @@ class Validator{
     }
 
     is_number(){
-        if(arguments[0] == 0) return false;
+        // if(arguments[0] == 0) return false;
         return (arguments[0].match(/^[0-9]+$/))? true: false;
     }
     
@@ -119,7 +119,7 @@ class docDB {
     constructor(){
         this.docBody = {};
         this.docBody._id = '';
-        this.docBody.type = this.constructor.name.toLowerCase();
+        this.docType = this.constructor.name.toLowerCase();
     }
 
     /**
@@ -130,7 +130,7 @@ class docDB {
     allDocs(){        
         // return new Promise((resolve, reject) => {
         return db.find({
-                    selector:{ type: this.docBody.type},
+                    selector:{ type: this.docType},
                     sort: [{'_id': 'desc'}]
                 }).then((result) => {
                     let docs = [];
@@ -188,7 +188,7 @@ class docDB {
             db.find({
                 selector: { 
                     _id: docId,
-                    type: this.docBody.type
+                    type: this.docType
                     }, 
             })
             .then(result => resolve(result.docs[0]))
@@ -217,6 +217,7 @@ class docDB {
         // this.docBody._id = new Date().toISOString();
         // this.docBody._id = docToSave._id ? docToSave._id :this.create_UUID();
         this.docBody._id = docToSave._id ? docToSave._id : new Date().getTime().toString();
+        this.docBody.type = this.docType;
         
         // let db = new PouchDB(uuid);
         // console.log(this.docBody);
@@ -231,7 +232,9 @@ class docDB {
                 
                 //deleting docBody makes it only in parent class.
                 // also improves performance in large object.
-                // delete this.docBody;
+                Object.keys(this.docBody).forEach(key => {
+                    this.docBody[key] = '';
+                });
                 return resolve(result);
             });
         });
@@ -298,10 +301,14 @@ class modalDoc extends docDB {
 
         return super.save(this.body)
                 .then((res) => {
-                    this.body._id = res.id;
-                    this.body._rev = res.rev;
+                    // this.body._id = res.id;
+                    // this.body._rev = res.rev;
 
                     // console.log(this.body);
+                    // delete this.body;
+                    Object.keys(this.body).forEach(key => {
+                        this.body[key] = '';
+                    });
                     return super.get(res.id);
                 });
     }
@@ -627,40 +634,82 @@ class Order extends modalDoc{
     
     save(docToSave){
 
-        let doc = {};
-                
-        doc.amount = docToSave.amount;
-        doc.party = docToSave.party;
-        doc.notes = 'For Invoice No. ' + docToSave.invoice;
-        
-        docToSave.paymentIds = [];
-        
-        if(docToSave.payment_mode != 'credit'){
-            doc.payment_mode = 'credit';
+        if(docToSave._rev == null){
+            // here when doc is new
+            let doc = {};
+                    
+            doc.amount = docToSave.amount;
+            doc.party = docToSave.party;
+            doc.notes = 'For Invoice No. ' + docToSave.invoice;
             
-            return new Payment().save(doc)
-                .then(res => {
-                    docToSave.paymentIds.push(res._id);
-                    doc.payment_mode = docToSave.payment_mode;
-                    return doc;                
-                })
-                .then(res => {
-                    return new Payment().save(res);
-                })
-                .then(res => {
-                    docToSave.paymentIds.push(res._id);
-                    return super.save(docToSave);
-                })
-            // .then(result => result);
+            docToSave.paymentIds = [];
+            
+            if(docToSave.payment_mode != 'credit'){
+                doc.payment_mode = 'credit';
+                
+                return new Payment().save(doc)
+                    .then(res => {
+                        docToSave.paymentIds.push(res._id);
+                        doc.payment_mode = docToSave.payment_mode;
+                        return doc;                
+                    })
+                    .then(res => {
+                        return new Payment().save(res);
+                    })
+                    .then(res => {
+                        docToSave.paymentIds.push(res._id);
+                        return super.save(docToSave);
+                    })
+                // .then(result => result);
+            } else {
+                doc.payment_mode = docToSave.payment_mode;
+                return new Payment().save(doc)
+                    .then(res => {
+                        docToSave.paymentIds.push(res._id);
+                        return super.save(docToSave);
+                    })
+            }
         } else {
-            doc.payment_mode = docToSave.payment_mode;
-            return new Payment().save(doc)
+            // here when document is updated.
+            let modalPayment = new Payment();
+            return modalPayment.get(docToSave.paymentIds[0])
                 .then(res => {
-                    docToSave.paymentIds.push(res._id);
-                    return super.save(docToSave);
+                    res.amount = docToSave.amount;
+                    res.payment_mode = 'credit';
+                    return modalPayment.save(res);
                 })
-        }
+                .then(res => {
+                    // docToSave.paymentIds[1] == null will be true when
+                    // payment_mode is credit and payment_mode is changed from credit to else.
+                    if(docToSave.paymentIds[1] == null) {
+                        docToSave.paymentIds[1].splice(1,2);
+                        if(docToSave.payment_mode != "credit"){
+                            delete res._id;
+                            delete res._rev;
+                            res.payment_mode = docToSave.payment_mode;
+                            return modalPayment.save(res)
+                                    .then(res => {
+                                        docToSave.paymentIds.push(res._id);
+                                        return res;
+                                    });
+                        }
 
+                        return res;
+                        
+                    }
+
+                    return modalPayment.get(docToSave.paymentIds[1])
+                            .then(res => {
+                                res.amount = (docToSave.payment_mode == 'credit') ? "0" : docToSave.amount;
+                                res.payment_mode = (docToSave.payment_mode == 'credit') ? res.payment_mode : docToSave.payment_mode;
+                                return modalPayment.save(res);
+                            });                    
+                })
+                .then(res => {
+                    console.log(res);
+                    return super.save(docToSave);
+                });
+        }
     }
     // save(docToSave){
     //     return super.save(docToSave).then(res => {
