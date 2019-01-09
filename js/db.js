@@ -84,7 +84,7 @@ function editDocument(editDoc){
     
     modal.get(editDoc._id)
     .then((doc) => {
-        console.log(doc);
+        console.log(JSON.parse(JSON.stringify(doc)));
         let iterableField = (modal.iterableFields[0].length) ? modal.iterableFields[1] : null;
         let iterableElementsCount;
         if(iterableField){

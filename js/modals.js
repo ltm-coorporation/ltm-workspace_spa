@@ -486,7 +486,8 @@ class Stock extends modalDoc{
 
     get fields(){
         return [
-            [['name', 'quantity', 'price', 'discount', 'tax', 'notes'], 'string']
+            [['name',  'notes'], 'string'],
+            [['quantity', 'price', 'discount', 'tax',], 'float']
         ];
     }
 
@@ -514,6 +515,17 @@ class Stock extends modalDoc{
             'tax': 'Tax',
             'notes': 'Notes'
         }
+    }
+
+    get(docId){
+        return super.get(docId)
+                .then(res => {
+                    res.quantity = parseFloat(res.quantity);
+                    res.price = parseFloat(res.price);
+                    res.discount = parseFloat(res.discount);
+                    res.tax = parseFloat(res.tax);
+                    return res;
+                });
     }
 
     allNameAndId(){
@@ -672,6 +684,8 @@ class Order extends modalDoc{
         } else {
             // here when document is updated.
             let modalPayment = new Payment();
+            let preDoc = this.get(docToSave._id);
+            let modalStock = new Stock();
             return modalPayment.get(docToSave.paymentIds[0])
                 .then(res => {
                     res.amount = docToSave.amount;
@@ -707,7 +721,22 @@ class Order extends modalDoc{
                 })
                 .then(res => {
                     console.log(res);
-                    return super.save(docToSave);
+                    let itemDetailsProp = docToSave['item-details'];
+                    let p = []
+                    itemDetailsProp.forEach(itemDetailObj => {
+                        console.log(itemDetailObj.item);
+                        p.push(modalStock.get(itemDetailObj.item)
+                                .then(res => {
+                                    console.log(res);
+                                    // res.quantity = res.quantity - preDoc.quantity + parseFdocToSave.quantity;
+                                    return modalStock.save(res);
+                                })
+                              );
+                        // itemDetailsProp['quantity']
+                    });
+                    // modalStock.get(pre)
+                    // delay ({},30);
+                    return Promise.all(p).then(res => super.save(docToSave));
                 });
         }
     }
