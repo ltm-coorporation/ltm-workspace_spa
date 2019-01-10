@@ -334,7 +334,7 @@ class Party extends modalDoc{
     }
 
     get tableFields() {
-        return ['name', 'city', 'phone', 'email'];
+        return ['name', 'city', 'due', 'phone', 'email'];
     }
 
     get formFields(){
@@ -363,7 +363,8 @@ class Party extends modalDoc{
             'city': 'City',
             'district': 'District',
             'state': 'State',
-            'pincode': 'Pincode'
+            'pincode': 'Pincode',
+            'due': 'Due'
         }
     }    
 
@@ -552,16 +553,16 @@ class Stock extends modalDoc{
         }
     }
 
-    get(docId){
-        return super.get(docId)
-                // .then(res => {
-                //     res.quantity = parseFloat(res.quantity);
-                //     res.price = parseFloat(res.price);
-                //     res.discount = parseFloat(res.discount);
-                //     res.tax = parseFloat(res.tax);
-                //     return res;
-                // });
-    }
+    // get(docId){
+    //     return super.get(docId)
+    //             // .then(res => {
+    //             //     res.quantity = parseFloat(res.quantity);
+    //             //     res.price = parseFloat(res.price);
+    //             //     res.discount = parseFloat(res.discount);
+    //             //     res.tax = parseFloat(res.tax);
+    //             //     return res;
+    //             // });
+    // }
 
     allNameAndId(){
         return super.allKeyAndId('name');
