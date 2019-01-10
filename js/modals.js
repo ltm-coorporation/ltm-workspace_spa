@@ -651,34 +651,34 @@ class Order extends modalDoc{
         }
     }
     
-    allDocs(){
-        return new Promise((resolve, reject) => {
-            super.allDocs()
-                .then(docArray => {
-                    return new Common().getKeyById(docArray, new Party(), 'name');
-                    // let p = [];
+    // allDocs(){
+    //     return new Promise((resolve, reject) => {
+    //         super.allDocs()
+    //             .then(docArray => {
+    //                 return new Common().getKeyById(docArray, new Party(), 'name');
+    //                 // let p = [];
 
-                    // docArray.forEach(docObj => {
-                    //     let partyId = docObj.doc.party; 
-                    //     p.push(
-                    //         new Promise((reso, rej) => {
-                    //             return new Party().getNameById(partyId)
-                    //                     .then(partyName => {
-                    //                         docObj.doc.party = partyName;
-                    //                     })
-                    //                     .then(_ => reso());
-                    //     }));
-                    // });
+    //                 // docArray.forEach(docObj => {
+    //                 //     let partyId = docObj.doc.party; 
+    //                 //     p.push(
+    //                 //         new Promise((reso, rej) => {
+    //                 //             return new Party().getNameById(partyId)
+    //                 //                     .then(partyName => {
+    //                 //                         docObj.doc.party = partyName;
+    //                 //                     })
+    //                 //                     .then(_ => reso());
+    //                 //     }));
+    //                 // });
 
-                    // return Promise.all(p)
-                    //       .then(_ => docArray);           
-                })
-                // .then(res => console.log(res))
-                // .catch(err => err);
-                .then(res => resolve(res))
-                .catch(err => reject(err));
-        });
-    }
+    //                 // return Promise.all(p)
+    //                 //       .then(_ => docArray);           
+    //             })
+    //             // .then(res => console.log(res))
+    //             // .catch(err => err);
+    //             .then(res => resolve(res))
+    //             .catch(err => reject(err));
+    //     });
+    // }
     
     save(docToSave){
 
@@ -720,60 +720,74 @@ class Order extends modalDoc{
         } else {
             // here when document is updated.
             let modalPayment = new Payment();
-            let preDoc = this.get(docToSave._id);
+            let preDoc = {};
             let modalStock = new Stock();
-            return modalPayment.get(docToSave.paymentIds[0])
+            return this.get(docToSave._id)
                 .then(res => {
-                    res.amount = docToSave.amount;
-                    res.payment_mode = 'credit';
-                    return modalPayment.save(res);
-                })
-                .then(res => {
-                    // docToSave.paymentIds[1] == null will be true when
-                    // payment_mode is credit and payment_mode is changed from credit to else.
-                    if(docToSave.paymentIds[1] == null) {
-                        docToSave.paymentIds[1].splice(1,2);
-                        if(docToSave.payment_mode != "credit"){
-                            delete res._id;
-                            delete res._rev;
-                            res.payment_mode = docToSave.payment_mode;
-                            return modalPayment.save(res)
+                    Object.assign(preDoc,res);
+                    // save credit payment and if other payment mode exist
+                    // save other payment mode as well.
+                    return modalPayment.get(docToSave.paymentIds[0])
+                        .then(res => {
+                            res.amount = docToSave.amount;
+                            res.payment_mode = 'credit';
+                            // returns credit doc.
+                            return modalPayment.save(res);
+                        })
+                        .then(res => {
+                            // docToSave.paymentIds[1] == null will be true when
+                            // payment_mode is credit and payment_mode is changed from credit to else.
+                            if(docToSave.paymentIds[1] == null) {
+                                // docToSave.paymentIds[1] = '';
+                                docToSave.paymentIds.splice(1,2);
+                                if(docToSave.payment_mode != "credit"){
+                                    delete res._id;
+                                    delete res._rev;
+                                    res.payment_mode = docToSave.payment_mode;
+                                    return modalPayment.save(res)
+                                            .then(res => {
+                                                docToSave.paymentIds.push(res._id);
+                                                // returns debit doc.
+                                                return res;
+                                            });
+                                }
+                                // returns credit doc.
+                                return res;
+                            }
+
+                            // this will run when debit payment also exist for order.
+                            return modalPayment.get(docToSave.paymentIds[1])
                                     .then(res => {
-                                        docToSave.paymentIds.push(res._id);
-                                        return res;
-                                    });
-                        }
-
-                        return res;
-                        
-                    }
-
-                    return modalPayment.get(docToSave.paymentIds[1])
-                            .then(res => {
-                                res.amount = (docToSave.payment_mode == 'credit') ? "0" : docToSave.amount;
-                                res.payment_mode = (docToSave.payment_mode == 'credit') ? res.payment_mode : docToSave.payment_mode;
-                                return modalPayment.save(res);
-                            });                    
-                })
-                .then(res => {
-                    console.log(res);
-                    let itemDetailsProp = docToSave['item-details'];
-                    let p = []
-                    itemDetailsProp.forEach(itemDetailObj => {
-                        console.log(itemDetailObj.item);
-                        p.push(modalStock.get(itemDetailObj.item)
-                                .then(res => {
-                                    console.log(res);
-                                    // res.quantity = res.quantity - preDoc.quantity + parseFdocToSave.quantity;
-                                    return modalStock.save(res);
-                                })
-                              );
-                        // itemDetailsProp['quantity']
-                    });
-                    // modalStock.get(pre)
-                    // delay ({},30);
-                    return Promise.all(p).then(res => super.save(docToSave));
-                });
+                                        res.amount = (docToSave.payment_mode == 'credit') ? "0" : docToSave.amount;
+                                        res.payment_mode = (docToSave.payment_mode == 'credit') ? res.payment_mode : docToSave.payment_mode;
+                                        // return debit doc.
+                                        return modalPayment.save(res);
+                                    });                    
+                        })
+                        .then(res => {
+                            // here res can be credit doc and debit doc.
+                            console.log(res);
+                            let itemDetailsProp = docToSave['item-details'];
+                            let p = []
+                            itemDetailsProp.forEach(itemDetailObj => {
+                                console.log(itemDetailObj.item);
+                                p.push(modalStock.get(itemDetailObj.item)
+                                        .then(res => {                                            
+                                            let preItemQuantity = 0;
+                                            preDoc['item-details'].forEach(preDocItemDetailObj => {
+                                                preItemQuantity = (preDocItemDetailObj.item == itemDetailObj.item) ? preDocItemDetailObj['item-quantity'] : 0;
+                                            })
+                                            res.quantity = (parseFloat(res.quantity) - parseFloat(itemDetailObj['item-quantity']) + parseFloat(preItemQuantity)).toFixed(3);
+                                            return modalStock.save(res);
+                                        })
+                                    );
+                                // itemDetailsProp['quantity']
+                            });
+                            // modalStock.get(pre)
+                            // delay ({},30);
+                            return Promise.all(p).then(res => super.save(docToSave));
+                        });
+           });
         }
     }
     // save(docToSave){
