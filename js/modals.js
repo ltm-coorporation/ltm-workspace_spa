@@ -240,15 +240,15 @@ class docDB {
         });
     }
 
-    create_UUID(){
-        var dt = new Date().getTime();
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = (dt + Math.random()*16)%16 | 0;
-            dt = Math.floor(dt/16);
-            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-        });
-        return uuid;
-    }
+    // create_UUID(){
+    //     var dt = new Date().getTime();
+    //     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    //         var r = (dt + Math.random()*16)%16 | 0;
+    //         dt = Math.floor(dt/16);
+    //         return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+    //     });
+    //     return uuid;
+    // }
 }
 
 /**
@@ -441,36 +441,71 @@ class Payment extends modalDoc{
         }
     }
 
-    allDocs(){
-        return new Promise((resolve, reject) => {
-            super.allDocs()
-            .then(docArray => {
-                return new Common().getKeyById(docArray, new Party(), 'name');
-                // let p = [];
+    // allDocs(){
+    //     return new Promise((resolve, reject) => {
+    //         super.allDocs()
+    //         .then(docArray => {
+    //             return new Common().getKeyById(docArray, new Party(), 'name');
+    //             // let p = [];
 
-                // docArray.forEach(docObj => {
-                //     let partyId = docObj.doc.party; 
-                //     p.push(
-                //         new Promise((reso, rej) => {
-                //             return new Party().getNameById(partyId)
-                //                     .then(partyName => {
-                //                         docObj.doc.party = partyName;
-                //                     })
-                //                     .then(_ => reso());
-                //     }));
-                // });
+    //             // docArray.forEach(docObj => {
+    //             //     let partyId = docObj.doc.party; 
+    //             //     p.push(
+    //             //         new Promise((reso, rej) => {
+    //             //             return new Party().getNameById(partyId)
+    //             //                     .then(partyName => {
+    //             //                         docObj.doc.party = partyName;
+    //             //                     })
+    //             //                     .then(_ => reso());
+    //             //     }));
+    //             // });
 
-                // return Promise.all(p)
-                //       .then(_ => docArray);            
-            })
-            .then(res => resolve(res))
-            .catch(err => reject(err));
-        });
-    }
+    //             // return Promise.all(p)
+    //             //       .then(_ => docArray);            
+    //         })
+    //         .then(res => resolve(res))
+    //         .catch(err => reject(err));
+    //     });
+    // }
+    
     save(docToSave){
-        // console.log(docToSave);
-        return super.save(docToSave);
-    }
+        
+        
+        return super.save(docToSave)
+                .then(res => {
+                    let credit = 0;
+                    let debit = 0;
+                    let due = 0;
+                    return this.allDocs()
+                            .then(resAll => {
+                                resAll.forEach(payment =>{
+                                    if(payment.doc.party == res.party){
+                                        console.log(payment.doc.amount);
+                                        if(payment.doc.payment_mode == 'credit'){
+                                            credit += parseFloat(payment.doc.amount);
+                                        } else {
+                                            debit += parseFloat(payment.doc.amount);
+                                        }
+                                    }
+                                });
+                            
+                                due = debit - credit;
+
+                                // return res;
+                                return new Party().get(res.party)
+                                .then(resp => {
+                                    resp.due = due.toFixed(3);
+                                    return new Party().save(resp)
+                                            .then(respn => {
+                                                // return original payment doc 
+                                                // when payment successfully saved
+                                                // and party due is updated.
+                                                return res;
+                                            });
+                                });
+                            });
+                });
+    }        
 }
 
 /**
@@ -519,13 +554,13 @@ class Stock extends modalDoc{
 
     get(docId){
         return super.get(docId)
-                .then(res => {
-                    res.quantity = parseFloat(res.quantity);
-                    res.price = parseFloat(res.price);
-                    res.discount = parseFloat(res.discount);
-                    res.tax = parseFloat(res.tax);
-                    return res;
-                });
+                // .then(res => {
+                //     res.quantity = parseFloat(res.quantity);
+                //     res.price = parseFloat(res.price);
+                //     res.discount = parseFloat(res.discount);
+                //     res.tax = parseFloat(res.tax);
+                //     return res;
+                // });
     }
 
     allNameAndId(){
