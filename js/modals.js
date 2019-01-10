@@ -322,6 +322,7 @@ class Party extends modalDoc{
 
     constructor(){
         super();
+        this.body.due = "0";
     }   
 
     get fields(){
