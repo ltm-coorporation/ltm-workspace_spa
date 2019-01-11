@@ -688,9 +688,9 @@ class Order extends modalDoc{
         });
     }
     
-    save(docToSave){
-        
+    save(docToSave){        
 
+        
         if(docToSave._rev == null){
             // here when doc is new
             let doc = {};
@@ -701,9 +701,11 @@ class Order extends modalDoc{
             
             docToSave.paymentIds = [];
             
+            // when payment_mode is other than debit.
             if(docToSave.payment_mode != 'credit'){
                 doc.payment_mode = 'credit';
                 
+                // credit payment
                 return new Payment().save(doc)
                     .then(res => {
                         docToSave.paymentIds.push(res._id);
@@ -711,6 +713,7 @@ class Order extends modalDoc{
                         return doc;                
                     })
                     .then(res => {
+                        // debit payment
                         return new Payment().save(res);
                     })
                     .then(res => {
@@ -719,7 +722,7 @@ class Order extends modalDoc{
                         return super.save(docToSave);
                     })
                 // .then(result => result);
-            } else {
+            } else { // credit payment only
                 doc.payment_mode = docToSave.payment_mode;
                 return new Payment().save(doc)
                     .then(res => {
@@ -738,71 +741,139 @@ class Order extends modalDoc{
                     Object.assign(preDoc,res);
                     // save credit payment and if other payment mode exist
                     // save other payment mode as well.
-                    return modalPayment.get(docToSave.paymentIds[0])
-                        .then(res => {
-                            res.amount = docToSave.amount;
-                            res.payment_mode = 'credit';
-                            // returns credit doc.
-                            return modalPayment.save(res);
-                        })
-                        .then(res => {
-                            // docToSave.paymentIds[1] == null will be true when
-                            // payment_mode is credit and payment_mode is changed from credit to else.
-                            if(docToSave.paymentIds[1] == null) {
-                                // docToSave.paymentIds[1] = '';
-                                docToSave.paymentIds.splice(1,2);
-                                if(docToSave.payment_mode != "credit"){
-                                    delete res._id;
-                                    delete res._rev;
-                                    res.payment_mode = docToSave.payment_mode;
-                                    return modalPayment.save(res)
-                                            .then(res => {
-                                                docToSave.paymentIds.push(res._id);
-                                                // returns debit doc.
-                                                return res;
-                                            });
-                                }
-                                // returns credit doc.
-                                return res;
-                            }
-
-                            // this will run when debit payment also exist for order.
+                    return modalPayment.get(docToSave.paymentIds[0]);
+                })
+                .then(res => {
+                    res.amount = docToSave.amount;
+                    res.payment_mode = 'credit'; // this should be already assigned when new payment entry is created for new order above.
+                    // returns saved credit doc.
+                    return modalPayment.save(res);
+                })
+                .then(res => {                    
+                    if(docToSave.payment_mode != 'credit'){
+                        // if payment mode is changed from credit to debit for orignal order.
+                        if(docToSave.paymentIds[1] == null){
+                            // splice is done is docToSave.paymentIds[1] is saved undefined.
+                            // docToSave.paymentIds.splice(1,2);
+                            delete res._id;
+                            delete res._rev;
+                            res.payment_mode = docToSave.payment_mode;
+                            // create new saved debit payment doc
+                            return modalPayment.save(res)
+                        }
+                    }
+                    // return if previous debit payment exist.
+                    // return if payment_mode is credit.
+                    return;
+                })
+                .then(res => {
+                    // if(Object.keys(res).length === 0 && res.constructor === Object)
+                    
+                    
+                    if(res != undefined){
+                        docToSave.paymentIds.push(res._id);
+                        // returns newly saved debit doc
+                        return res;                        
+                    } else {
+                        if(docToSave.paymentIds[1] != null){
                             return modalPayment.get(docToSave.paymentIds[1])
                                     .then(res => {
                                         res.amount = (docToSave.payment_mode == 'credit') ? "0" : docToSave.amount;
                                         res.payment_mode = (docToSave.payment_mode == 'credit') ? res.payment_mode : docToSave.payment_mode;
-                                        // return debit doc.
+                                        // returns resaved debit payment doc.
                                         return modalPayment.save(res);
-                                    });                    
-                        })
-                        .then(res => {
-                            // here res can be credit doc and debit doc.
-                            console.log(res);
-                            let itemDetailsProp = docToSave['item-details'];
-                            let p = []
-                            itemDetailsProp.forEach(itemDetailObj => {
-                                console.log(itemDetailObj.item);
-                                p.push(modalStock.get(itemDetailObj.item)
-                                        .then(res => {                                            
-                                            let preItemQuantity = 0;
-                                            preDoc['item-details'].forEach(preDocItemDetailObj => {
-                                                preItemQuantity = (preDocItemDetailObj.item == itemDetailObj.item) ? preDocItemDetailObj['item-quantity'] : 0;
-                                            })
-                                            res.quantity = (parseFloat(res.quantity) - parseFloat(itemDetailObj['item-quantity']) + parseFloat(preItemQuantity)).toFixed(3);
-                                            return modalStock.save(res);
-                                        })
-                                    );
-                                // itemDetailsProp['quantity']
-                            });
-                            // modalStock.get(pre)
-                            // delay ({},30);
-                            return Promise.all(p).then(res => {
-                                docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
-                                return super.save(docToSave);
-                            });
-                        });
-           });
-        }
+                                    });
+                        }
+                    }
+
+                    // return if payment_mode is credit
+                    return;
+                })
+                .then(res => {
+                    if(res == undefined){
+                        // order is credit
+                    } else {
+                        // order is debit
+                    }
+
+                    return;
+                })
+                // now updating stock
+                .then(res => {
+
+                    let itemDetailsProp = docToSave['item-details'];
+                    let p = []
+                    itemDetailsProp.forEach(itemDetailObj => {
+                        console.log(itemDetailObj.item);
+                        p.push(modalStock.get(itemDetailObj.item)
+                                .then(res => {                                            
+                                    let preItemQuantity = 0;
+                                    preDoc['item-details'].forEach(preDocItemDetailObj => {
+                                        preItemQuantity = (preDocItemDetailObj.item == itemDetailObj.item) ? preDocItemDetailObj['item-quantity'] : 0;
+                                    })
+                                    res.quantity = (parseFloat(res.quantity) - parseFloat(itemDetailObj['item-quantity']) + parseFloat(preItemQuantity)).toFixed(3);
+                                    return modalStock.save(res);
+                                })
+                            );                        
+                    });
+                    
+                    return Promise.all(p).then(res => {
+                        docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
+                        return super.save(docToSave);
+                    });
+                });
+                // .then(res => {
+                //     // here res is credit doc in payments for order.
+                //     // docToSave.paymentIds[1] == null will be true when
+                //     // payment_mode is credit 
+                //     // and payment_mode is changed from credit to else when initial payment_mode is credit.
+                //     if(docToSave.paymentIds[1] == null) {
+                //         // docToSave.paymentIds[1] = '';
+                //         // splice is done is docToSave.paymentIds[1] is saved undefined.
+                //         docToSave.paymentIds.splice(1,2);
+                //         if(docToSave.payment_mode != "credit"){
+                //             delete res._id;
+                //             delete res._rev;
+                //             res.payment_mode = docToSave.payment_mode;
+                //             // create new debit payment doc
+                //             // return modalPayment.save(res)
+                //                     // .then(res => {
+                //                     //     docToSave.paymentIds.push(res._id);
+                //                     //     // returns debit doc.
+                //                     //     return res;
+                //                     // });
+                //         }
+                //         // returns debit doc to be saved.
+                //         return res;
+                //     }
+                //     // return empty object is debit payment id exist in order.
+                //     return {};
+                // })
+                // .then(res => {
+                //     // this res doc can be credit and debit.
+                //     // here if res._id and res._rev exist its credit doc
+                //     // otherwise debit doc to be saved.
+                    
+                //     if(Object.keys(res).length === 0 && res.constructor === Object){
+                //        // empty object, so debit payment id exist in order.
+                //        // this will run when debit payment also exist for order.
+                //         return modalPayment.get(docToSave.paymentIds[1])
+                //         .then(res => {
+                //             res.amount = (docToSave.payment_mode == 'credit') ? "0" : docToSave.amount;
+                //             res.payment_mode = (docToSave.payment_mode == 'credit') ? res.payment_mode : docToSave.payment_mode;
+                //             // return debit doc.
+                //             return modalPayment.save(res);
+                //         });
+                //     }
+
+                    
+
+                //     return modalPayment.save(res);
+                // }).
+                // then(res => {
+                                                
+                //         })
+       }
     }
     // save(docToSave){
     //     return super.save(docToSave).then(res => {
