@@ -744,6 +744,7 @@ class Order extends modalDoc{
                     return modalPayment.get(docToSave.paymentIds[0]);
                 })
                 .then(res => {
+                    res.party = docToSave.party;
                     res.amount = docToSave.amount;
                     res.payment_mode = 'credit'; // this should be already assigned when new payment entry is created for new order above.
                     // returns saved credit doc.
@@ -778,6 +779,7 @@ class Order extends modalDoc{
                         if(docToSave.paymentIds[1] != null){
                             return modalPayment.get(docToSave.paymentIds[1])
                                     .then(res => {
+                                        res.party = docToSave.party;
                                         res.amount = (docToSave.payment_mode == 'credit') ? "0" : docToSave.amount;
                                         res.payment_mode = (docToSave.payment_mode == 'credit') ? res.payment_mode : docToSave.payment_mode;
                                         // returns resaved debit payment doc.
