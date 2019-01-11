@@ -3,6 +3,20 @@ function orderAddForm(){
     // order module
     $(new Form(new Order()).view()).insertBefore('#btn-order_add');
     
+    $('[name="order[due_date]"]').datepicker({
+        format: 'mm/dd/yyyy',        
+    });
+
+
+    setTimeout(() => {
+        let el = document.getElementsByName('order[due_date]')[0];
+        let due_date = parseInt(el.value);
+        
+        $('[name="order[due_date]"]').datepicker('update', ' ');
+        $('[name="order[due_date]"]').datepicker('update', new Date(due_date));
+    }, 300);
+        
+    
     new Party().allNameAndId()
     .then(partyNamesAndId => {
         let data = [];

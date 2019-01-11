@@ -602,8 +602,8 @@ class Order extends modalDoc{
 
     get fields(){
         return[
-            [['party', 'invoice', 'status', 'payment_mode', 'due_date', 'notes'],'string'],
-            [['item'], 'number'],
+            [['party', 'invoice', 'status', 'payment_mode',  'notes'],'string'],
+            [['item', 'due_date'], 'number'],
             [['amount', 'item-rate', 'item-quantity', 'item-amount'], 'float'],
             [['item-details'], 'iterable']
         ];
@@ -660,6 +660,9 @@ class Order extends modalDoc{
         return new Promise((resolve, reject) => {
             super.allDocs()
                 .then(docArray => {
+                    docArray.forEach(docObj => {
+                        docObj.doc.due_date = new Date(parseInt(docObj.doc.due_date)).toLocaleDateString('en-US');
+                    });
                     return new Common().getKeyById(docArray, new Party(), 'name');
                     // let p = [];
 
@@ -686,6 +689,7 @@ class Order extends modalDoc{
     }
     
     save(docToSave){
+        
 
         if(docToSave._rev == null){
             // here when doc is new
@@ -719,6 +723,7 @@ class Order extends modalDoc{
                 return new Payment().save(doc)
                     .then(res => {
                         docToSave.paymentIds.push(res._id);
+                        docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
                         return super.save(docToSave);
                     })
             }
@@ -790,7 +795,10 @@ class Order extends modalDoc{
                             });
                             // modalStock.get(pre)
                             // delay ({},30);
-                            return Promise.all(p).then(res => super.save(docToSave));
+                            return Promise.all(p).then(res => {
+                                docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
+                                return super.save(docToSave);
+                            });
                         });
            });
         }
