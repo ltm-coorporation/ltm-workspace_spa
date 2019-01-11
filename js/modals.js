@@ -800,9 +800,9 @@ class Order extends modalDoc{
 
                     return;
                 })
-                // now updating stock
+                // payments update are done and now updating stock
                 .then(res => {
-
+                    // Boolean(res) == false
                     let itemDetailsProp = docToSave['item-details'];
                     let p = []
                     itemDetailsProp.forEach(itemDetailObj => {
@@ -824,6 +824,8 @@ class Order extends modalDoc{
                         return super.save(docToSave);
                     });
                 });
+        }
+    }
                 // .then(res => {
                 //     // here res is credit doc in payments for order.
                 //     // docToSave.paymentIds[1] == null will be true when
@@ -875,8 +877,8 @@ class Order extends modalDoc{
                 // then(res => {
                                                 
                 //         })
-       }
-    }
+    //    }
+    // }
     // save(docToSave){
     //     return super.save(docToSave).then(res => {
     //             let doc = {}
