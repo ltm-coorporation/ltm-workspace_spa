@@ -604,7 +604,7 @@ class Order extends modalDoc{
         return[
             [['party', 'invoice', 'status', 'payment_mode',  'notes'],'string'],
             [['item', 'due_date'], 'number'],
-            [['amount', 'item-rate', 'item-quantity', 'item-amount'], 'float'],
+            [['amount', 'item-rate', 'item-quantity', 'item-discount', 'item-amount'], 'float'],
             [['item-details'], 'iterable']
         ];
     }
@@ -621,7 +621,7 @@ class Order extends modalDoc{
                 ['item', 'select'],
                 ['item-quantity', 'input', 'number', '0.002'],
                 ['item-rate', 'input', 'number', '0.002'],
-                // ['item-discount', 'input', 'number', '0.002'],
+                ['item-discount', 'input', 'number', '0.002'],
                 // ['item-tax', 'input', 'number', '0.002'],
                 ['item-amount', 'input', 'number', '0.002'],
             ],
@@ -644,7 +644,7 @@ class Order extends modalDoc{
             'item': 'Item Name',
             'item-quantity': 'Quantity',
             'item-rate': 'Rate',
-            'item-discount': 'Discount',
+            'item-discount': 'Discount (%)',
             'item-tax': 'Tax',
             'item-amount': 'Item Amount',
             'amount': 'Net Payable Amount',
@@ -715,6 +715,7 @@ class Order extends modalDoc{
                     })
                     .then(res => {
                         docToSave.paymentIds.push(res._id);
+                        docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
                         return super.save(docToSave);
                     })
                 // .then(result => result);

@@ -152,9 +152,11 @@ function orderAddForm(){
                     el = el.parentNode;
                 };                
                 
-                let rate = e.params.data.price;
+                let itemData = e.params.data;
                 let defaultQuantity = 1;
-                el.querySelector('[name="order[item-rate]"]').value = rate;                
+                let defaultDiscount = 0;
+                el.querySelector('[name="order[item-rate]"]').value = itemData.price;
+                el.querySelector('[name="order[item-discount]"]').value = defaultDiscount
                 el.querySelector('[name="order[item-quantity]"').value = defaultQuantity;
                 el.querySelector('[name="order[item-rate]"]').dispatchEvent(new Event('change'));
             });
@@ -169,21 +171,24 @@ function orderAddForm(){
                 };                
                 
                 el.querySelector('[name="order[item-rate]"]').value = '';
+                el.querySelector('[name="order[item-discount]"]').value = '';
                 el.querySelector('[name="order[item-quantity]"').value = '';
                 el.querySelector('[name="order[item-rate]"]').dispatchEvent(new Event('change'));
             });
         });
 
         row.querySelector('[name="order[item-rate]"]').addEventListener('change', updateItemAmount);
+        row.querySelector('[name="order[item-discount]"]').addEventListener('change', updateItemAmount);
         row.querySelector('[name="order[item-quantity]"]').addEventListener('change', updateItemAmount);
         row.querySelector('[name="order[item-amount]"]').addEventListener('change', updateNetAmount);
         row.getElementsByClassName('btn-row_add')[0].addEventListener('click', addItemRow);
 
         function updateItemAmount(e){
-            let itemRate = row.querySelector('[name="order[item-rate]"]').value;
-            let itemQuantity = row.querySelector('[name="order[item-quantity]"]').value;
+            let itemRate = parseFloat(row.querySelector('[name="order[item-rate]"]').value);
+            let itemQuantity = parseFloat(row.querySelector('[name="order[item-quantity]"]').value);
+            let itemDiscountPer = parseFloat(row.querySelector('[name="order[item-discount]"]').value);
 
-            row.querySelector('[name="order[item-amount]"]').value = parseFloat(itemRate * itemQuantity).toFixed(3);
+            row.querySelector('[name="order[item-amount]"]').value = ((itemRate * itemQuantity) - ((itemRate * itemQuantity)*itemDiscountPer/100)).toFixed(3);
             
             updateNetAmount();
         }
