@@ -470,15 +470,14 @@ class Payment extends modalDoc{
         });
     }
     
-    save(docToSave){
-        
+    save(docToSave){        
         
         return super.save(docToSave)
                 .then(res => {
                     let credit = 0;
                     let debit = 0;
                     let due = 0;
-                    return this.allDocs()
+                    return super.allDocs()
                             .then(resAll => {
                                 resAll.forEach(payment =>{
                                     if(payment.doc.party == res.party){
