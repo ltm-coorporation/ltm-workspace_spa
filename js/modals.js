@@ -443,32 +443,32 @@ class Payment extends modalDoc{
         }
     }
 
-    // allDocs(){
-    //     return new Promise((resolve, reject) => {
-    //         super.allDocs()
-    //         .then(docArray => {
-    //             return new Common().getKeyById(docArray, new Party(), 'name');
-    //             // let p = [];
+    allDocs(){
+        return new Promise((resolve, reject) => {
+            super.allDocs()
+            .then(docArray => {
+                return new Common().getKeyById(docArray, new Party(), 'name');
+                // let p = [];
 
-    //             // docArray.forEach(docObj => {
-    //             //     let partyId = docObj.doc.party; 
-    //             //     p.push(
-    //             //         new Promise((reso, rej) => {
-    //             //             return new Party().getNameById(partyId)
-    //             //                     .then(partyName => {
-    //             //                         docObj.doc.party = partyName;
-    //             //                     })
-    //             //                     .then(_ => reso());
-    //             //     }));
-    //             // });
+                // docArray.forEach(docObj => {
+                //     let partyId = docObj.doc.party; 
+                //     p.push(
+                //         new Promise((reso, rej) => {
+                //             return new Party().getNameById(partyId)
+                //                     .then(partyName => {
+                //                         docObj.doc.party = partyName;
+                //                     })
+                //                     .then(_ => reso());
+                //     }));
+                // });
 
-    //             // return Promise.all(p)
-    //             //       .then(_ => docArray);            
-    //         })
-    //         .then(res => resolve(res))
-    //         .catch(err => reject(err));
-    //     });
-    // }
+                // return Promise.all(p)
+                //       .then(_ => docArray);            
+            })
+            .then(res => resolve(res))
+            .catch(err => reject(err));
+        });
+    }
     
     save(docToSave){
         
@@ -619,8 +619,10 @@ class Order extends modalDoc{
             ['party', 'select'],
             [
                 ['item', 'select'],
-                ['item-rate', 'input', 'number', '0.002'],    
                 ['item-quantity', 'input', 'number', '0.002'],
+                ['item-rate', 'input', 'number', '0.002'],
+                // ['item-discount', 'input', 'number', '0.002'],
+                // ['item-tax', 'input', 'number', '0.002'],
                 ['item-amount', 'input', 'number', '0.002'],
             ],
             ['amount', 'input', 'number', '0.002'],
@@ -640,8 +642,10 @@ class Order extends modalDoc{
             'invoice' : 'Invoice No.',
             'party' : 'Party Name',
             'item': 'Item Name',
-            'item-rate': 'Rate',
             'item-quantity': 'Quantity',
+            'item-rate': 'Rate',
+            'item-discount': 'Discount',
+            'item-tax': 'Tax',
             'item-amount': 'Item Amount',
             'amount': 'Net Payable Amount',
             'net_amount': 'Net Amount',
@@ -652,34 +656,34 @@ class Order extends modalDoc{
         }
     }
     
-    // allDocs(){
-    //     return new Promise((resolve, reject) => {
-    //         super.allDocs()
-    //             .then(docArray => {
-    //                 return new Common().getKeyById(docArray, new Party(), 'name');
-    //                 // let p = [];
+    allDocs(){
+        return new Promise((resolve, reject) => {
+            super.allDocs()
+                .then(docArray => {
+                    return new Common().getKeyById(docArray, new Party(), 'name');
+                    // let p = [];
 
-    //                 // docArray.forEach(docObj => {
-    //                 //     let partyId = docObj.doc.party; 
-    //                 //     p.push(
-    //                 //         new Promise((reso, rej) => {
-    //                 //             return new Party().getNameById(partyId)
-    //                 //                     .then(partyName => {
-    //                 //                         docObj.doc.party = partyName;
-    //                 //                     })
-    //                 //                     .then(_ => reso());
-    //                 //     }));
-    //                 // });
+                    // docArray.forEach(docObj => {
+                    //     let partyId = docObj.doc.party; 
+                    //     p.push(
+                    //         new Promise((reso, rej) => {
+                    //             return new Party().getNameById(partyId)
+                    //                     .then(partyName => {
+                    //                         docObj.doc.party = partyName;
+                    //                     })
+                    //                     .then(_ => reso());
+                    //     }));
+                    // });
 
-    //                 // return Promise.all(p)
-    //                 //       .then(_ => docArray);           
-    //             })
-    //             // .then(res => console.log(res))
-    //             // .catch(err => err);
-    //             .then(res => resolve(res))
-    //             .catch(err => reject(err));
-    //     });
-    // }
+                    // return Promise.all(p)
+                    //       .then(_ => docArray);           
+                })
+                // .then(res => console.log(res))
+                // .catch(err => err);
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
     
     save(docToSave){
 
