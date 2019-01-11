@@ -610,7 +610,7 @@ class Order extends modalDoc{
     }
 
     get iterableFields(){
-        return [['item', 'item-rate', 'item-quantity', 'item-amount'], 'item-details'];
+        return [['item', 'item-rate', 'item-quantity', 'item-discount', 'item-amount'], 'item-details'];
     }
      
     get formFields(){
