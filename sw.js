@@ -110,4 +110,4 @@ self.addEventListener('fetch', function(event) {
 //       .then(res => window.location.reload)
 //     );
 //   });
-let version = 0.016;
+let version = 0.018;
