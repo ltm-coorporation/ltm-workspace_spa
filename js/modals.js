@@ -20,13 +20,12 @@ class Common{
             }));
         });
 
+        
         return Promise.all(p)
               .then(_ => docArray);              
     }
 }
-
 class Validator{
-
     is_float(){
         if(this.is_number(arguments[0])) return true;
         return (arguments[0].match(/\-?\d+\.\d+$/))? true: false;
@@ -98,7 +97,7 @@ class Validator{
                                 }
                             });
                             validDoc[field].value.push(tempObj);
-                        });                        
+                        });   
                     }                    
                     
                     if(!validDoc[field].isValid){
@@ -470,7 +469,8 @@ class Payment extends modalDoc{
         });
     }
     
-    save(docToSave){        
+    
+    save(docToSave){   
         
         return super.save(docToSave)
                 .then(res => {
@@ -720,6 +720,11 @@ class Order extends modalDoc{
                         docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
                         return super.save(docToSave);
                     })
+
+                    .catch(err => {
+                        console.log(err);
+                        return super.save(docToSave);
+                    })
                 // .then(result => result);
             } else { // credit payment only
                 doc.payment_mode = docToSave.payment_mode;
@@ -729,6 +734,9 @@ class Order extends modalDoc{
                         docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
                         return super.save(docToSave);
                     })
+                    .catch(err => {
+                        return super.save(docToSave); 
+                    });
             }
         } else {
             // here when document is updated.
@@ -822,6 +830,9 @@ class Order extends modalDoc{
                         docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
                         return super.save(docToSave);
                     });
+                })
+                .catch(err => {
+                    return super.save(docToSave);
                 });
         }
     }
