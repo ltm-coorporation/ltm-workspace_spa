@@ -93,6 +93,36 @@
             </li>
         </ul>
     </div>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#syncModal" data-whatever="@mdo">Sync</button>
+
+    <div class="modal fade" id="syncModal" tabindex="-1" role="dialog" aria-labelledby="syncModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="syncModalLabel">Sync Credentials</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form>
+            <div class="form-group">
+                <label for="recipient-name" class="col-form-label">Username:</label>
+                <input type="text" class="form-control" id="modal-username">
+            </div>
+            <div class="form-group">
+                <label for="message-text" class="col-form-label">Password:</label>
+                <input type="password" class="form-control" id="modal-password"></input>
+            </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="btnSync">Begin Sync</button>
+        </div>
+        </div>
+    </div>
+    </div>
 </nav>
 <br>
 <div class="container" id="app"></div>
@@ -437,6 +467,7 @@
 <script src="/js/modals.js"></script>
 <script src="/js/handlers.js"></script>
 <script src="/js/db.js"></script>
+<script src="/js/syncView.js"></script>
 <!-- <script src="/sw.js"></script> -->
 </body>
 </html>
