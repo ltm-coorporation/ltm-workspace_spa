@@ -72,7 +72,7 @@ function appReload(toggleNavbar = true){
     // /edit doc module
     setTimeout(() => {
         observer.observe(targetNode, config);
-    }, 3000); 
+    }, 300); 
 }
 
 function editDocument(editDoc){    

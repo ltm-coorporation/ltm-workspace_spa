@@ -54,7 +54,7 @@ class HTMLTable extends viewElements{
             this.tbodyTag.appendChild(this.tableRowBuilder(docBody.doc, fields, index+1));
         });
 
-        this.tableTag.appendChild(this.tbodyTag.cloneNode(true));
+        this.tableTag.appendChild(this.tbodyTag);
 
         return this.tableTag;
     }
@@ -87,7 +87,9 @@ class HTMLTable extends viewElements{
         btn.setAttribute('class', 'btn btn-primary');
         btn.innerHTML = 'Edit';
         btn.addEventListener('click', function(doc){
+            
             docToEdit = {};
+            // console.log(doc);
             docToEdit = doc;
     
             (new ltm()).navigateTo(`/${doc.type}/edit`)
