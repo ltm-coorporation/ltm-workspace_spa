@@ -45,7 +45,7 @@ function appReload(toggleNavbar = true){
 
     // if(toggleNavbar) $('.navbar-toggler').click();
     
-    $('.navigator').on('click', (e) => {
+    $('.breadcrumb-navigator').on('click', (e) => {
 
         e.preventDefault();
 
