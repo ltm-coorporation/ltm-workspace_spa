@@ -35,7 +35,7 @@ class HTMLTable extends viewElements{
         
         this.reset;
 
-        this.tableTag.setAttribute("class","table table-stripped");
+        this.tableTag.setAttribute("class","table table-stripped table-hover");
         this.theadTag.setAttribute("class", "thead-light");
             this.thTag.setAttribute("scope","col");
             this.thTag.innerHTML = "#";
