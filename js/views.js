@@ -36,11 +36,12 @@ class HTMLTable extends viewElements{
         fields.push('Action');
         this.reset;
 
-        this.tableTag.setAttribute("class","table table-stripped table-hover");
-        this.theadTag.setAttribute("class", "thead-light");
-            this.thTag.setAttribute("scope","col");
+        this.tableTag.setAttribute("class","table table-striped table-bordered table-sm");
+        // this.theadTag.setAttribute("class", "thead-light");
+            this.thTag.setAttribute("scope","col");            
             this.thTag.innerHTML = "#";
             this.trTag.appendChild(this.thTag.cloneNode(true));
+            this.thTag.setAttribute("style", "width: 25%");
             fields.forEach(header => {
                 this.thTag.innerHTML = (this.modal.fieldAlias[header]) ? this.modal.fieldAlias[header] : header;
                 this.trTag.appendChild(this.thTag.cloneNode(true));
@@ -61,13 +62,13 @@ class HTMLTable extends viewElements{
 
     tableRowBuilder(rowDataObj, rowFields, index){
         var tr = document.createElement('tr');
-        var th = document.createElement('th');
+        // var th = document.createElement('th');
         var td = document.createElement('td');
         var btn = document.createElement('button');
     
-        th.setAttribute('scope', 'row');
-        th.innerHTML = index;
-        tr.appendChild(th.cloneNode(true));
+        // th.setAttribute('scope', 'row');
+        td.innerHTML = index;
+        tr.appendChild(td.cloneNode(true));
     
         rowFields.forEach(function(key){
             if(rowDataObj.hasOwnProperty(key)){
