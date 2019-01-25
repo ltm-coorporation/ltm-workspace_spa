@@ -337,15 +337,21 @@ function alertDocSave(modal){
 }
 
 function drawTable(rows, modal){
-    let prefix = modal.constructor.name.toLowerCase();
-    let tbody = document.getElementById(`${prefix}-table_body`);
-    let fields = modal.tableFields;
+    // let prefix = modal.constructor.name.toLowerCase();
+    // let tbody = document.getElementById(`${prefix}-table_body`);
+    // let fields = modal.tableFields;
 
-    tbody.innerHTML = '';
+    // tbody.innerHTML = '';
 
-    rows.forEach((docBody, index) => {
-        tbody.appendChild(tableRowBuilder(docBody.doc, fields, index+1));
-    });
+    let appRoot = document.getElementById('app');
+    let tableTag = new HTMLTable(modal).view(rows);
+    appRoot.appendChild(tableTag);
+    
+
+    // htmltable.view(rows);
+    // rows.forEach((docBody, index) => {
+    //     tbody.appendChild(tableRowBuilder(docBody.doc, fields, index+1));
+    // });
 }
 
 function tableRowBuilder(rowDataObj, rowFields, index){

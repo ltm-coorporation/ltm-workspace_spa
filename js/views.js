@@ -31,8 +31,9 @@ class HTMLTable extends viewElements{
         })
     }
 
-    view(){
-        
+    view(rows = []){
+        let fields = this.modal.tableFields;
+        fields.push('Action');
         this.reset;
 
         this.tableTag.setAttribute("class","table table-stripped table-hover");
@@ -40,17 +41,62 @@ class HTMLTable extends viewElements{
             this.thTag.setAttribute("scope","col");
             this.thTag.innerHTML = "#";
             this.trTag.appendChild(this.thTag.cloneNode(true));
-            this.modal.tableFields.forEach(header => {
-                this.thTag.innerHTML = header;
+            fields.forEach(header => {
+                this.thTag.innerHTML = (this.modal.fieldAlias[header]) ? this.modal.fieldAlias[header] : header;
                 this.trTag.appendChild(this.thTag.cloneNode(true));
             });
         this.theadTag.appendChild(this.trTag.cloneNode(true));
         this.tableTag.appendChild(this.theadTag.cloneNode(true));
                 
-        this.tbodyTag.setAttribute('id', `${this.modal.constructor.name.toLowerCase()}-table_body`)
+        this.tbodyTag.setAttribute('id', `${this.modal.constructor.name.toLowerCase()}-table_body`)        
+        
+        rows.forEach((docBody, index) => {
+            this.tbodyTag.appendChild(this.tableRowBuilder(docBody.doc, fields, index+1));
+        });
+
         this.tableTag.appendChild(this.tbodyTag.cloneNode(true));
 
         return this.tableTag;
+    }
+
+    tableRowBuilder(rowDataObj, rowFields, index){
+        var tr = document.createElement('tr');
+        var th = document.createElement('th');
+        var td = document.createElement('td');
+        var btn = document.createElement('button');
+    
+        th.setAttribute('scope', 'row');
+        th.innerHTML = index;
+        tr.appendChild(th.cloneNode(true));
+    
+        rowFields.forEach(function(key){
+            if(rowDataObj.hasOwnProperty(key)){
+                // console.log(key);
+                // // console.log(globalConst.process_status[key]);
+                switch(key){
+                    case 'status': td.innerHTML = globalConst.process_status[rowDataObj[key]];
+                                    break;
+                    default: td.innerHTML = rowDataObj[key];
+                }
+                // td.innerHTML = (key == 'created_at')? (new Date(rowDataObj[key])).toLocaleDateString() : rowDataObj[key];
+                tr.appendChild(td.cloneNode(true));
+            }
+        });
+    
+        btn.setAttribute('type', 'button');
+        btn.setAttribute('class', 'btn btn-primary');
+        btn.innerHTML = 'Edit';
+        btn.addEventListener('click', function(doc){
+            docToEdit = {};
+            docToEdit = doc;
+    
+            (new ltm()).navigateTo(`/${doc.type}/edit`)
+        }.bind(this, rowDataObj));
+        td.innerHTML = '';
+        td.appendChild(btn);
+        tr.appendChild(td);
+    
+        return tr;
     }
 }
 
