@@ -1,15 +1,15 @@
 
 var uuid = 'uuid';
 var db = new PouchDB(uuid);
-var remoteCouch = `http://ltm:qwerty@localhost:5984/${uuid}`;
+// var remoteCouch = `http://ltm:qwerty@localhost:5984/${uuid}`;
 // var account = 'a9b5854b-543d-4dba-b22d-bd4a899d2dd3-bluemix';
 // var remoteCouch = `https://oughtchaveringstensiling:8eceff51782b5087bcb3d318fd9e1fed4b0fedf6@${account}.cloudant.com/ltm-app`;
 var itemData = [];
 var docToEdit = {};
-db.changes({
-    since:'now',
-    live: true
-});
+// db.changes({
+//     since:'now',
+//     live: true
+// });
 
 db.createIndex({
     index: {
@@ -34,9 +34,9 @@ var observer = new MutationObserver(callback);
 
 window.addEventListener('load', () =>  {
 
-    db.replicate.to(remoteCouch)
+    // db.replicate.to(remoteCouch)
         // .on('complete', (result) => console.log(result));
-    db.replicate.from(remoteCouch)
+    // db.replicate.from(remoteCouch)
         // .on('complete', (result) => console.log(result));
     appReload(false);
 });

@@ -41,8 +41,8 @@ class HTMLTable extends viewElements{
             this.thTag.setAttribute("scope","col");            
             this.thTag.innerHTML = "#";
             this.trTag.appendChild(this.thTag.cloneNode(true));
-            this.thTag.setAttribute("style", "width: 25%");
-            fields.forEach(header => {
+            this.thTag.setAttribute("style", "width: 21%");
+            fields.forEach((header, index) => {
                 this.thTag.innerHTML = (this.modal.fieldAlias[header]) ? this.modal.fieldAlias[header] : header;
                 this.trTag.appendChild(this.thTag.cloneNode(true));
             });
@@ -54,6 +54,14 @@ class HTMLTable extends viewElements{
         rows.forEach((docBody, index) => {
             this.tbodyTag.appendChild(this.tableRowBuilder(docBody.doc, fields, index+1));
         });
+
+        if(rows.length == 0){
+            this.tdTag.setAttribute("colspan", 12);
+            this.tdTag.innerHTML = 'No Results Found';
+            this.trTag.innerHTML = '';
+            this.trTag.appendChild(this.tdTag);
+            this.tbodyTag.appendChild(this.trTag);
+        }
 
         this.tableTag.appendChild(this.tbodyTag);
 
