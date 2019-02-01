@@ -689,6 +689,8 @@ class Order extends modalDoc{
     
     save(docToSave){        
 
+        let modalPayment = new Payment();
+        let preDoc = {};
         
         if(docToSave._rev == null){
             // here when doc is new
@@ -717,8 +719,13 @@ class Order extends modalDoc{
                     })
                     .then(res => {
                         docToSave.paymentIds.push(res._id);
-                        docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
-                        return super.save(docToSave);
+                        // docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
+                        // return super.save(docToSave);
+                        return processStock(docToSave)
+                        .then(res => {
+                            docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
+                            return super.save(docToSave);
+                        });
                     })
 
                     .catch(err => {
@@ -731,8 +738,13 @@ class Order extends modalDoc{
                 return new Payment().save(doc)
                     .then(res => {
                         docToSave.paymentIds.push(res._id);
-                        docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
-                        return super.save(docToSave);
+                        // docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
+                        // return super.save(docToSave);
+                        return processStock(docToSave)
+                        .then(res => {
+                            docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
+                            return super.save(docToSave);
+                        });
                     })
                     .catch(err => {
                         return super.save(docToSave); 
@@ -740,9 +752,6 @@ class Order extends modalDoc{
             }
         } else {
             // here when document is updated.
-            let modalPayment = new Payment();
-            let preDoc = {};
-            let modalStock = new Stock();
             return this.get(docToSave._id)
                 .then(res => {
                     Object.assign(preDoc,res);
@@ -810,29 +819,43 @@ class Order extends modalDoc{
                 // payments update are done and now updating stock
                 .then(res => {
                     // Boolean(res) == false
-                    let itemDetailsProp = docToSave['item-details'];
-                    let p = []
-                    itemDetailsProp.forEach(itemDetailObj => {
-                        console.log(itemDetailObj.item);
-                        p.push(modalStock.get(itemDetailObj.item)
-                                .then(res => {                                            
-                                    let preItemQuantity = 0;
-                                    preDoc['item-details'].forEach(preDocItemDetailObj => {
-                                        preItemQuantity = (preDocItemDetailObj.item == itemDetailObj.item) ? preDocItemDetailObj['item-quantity'] : 0;
-                                    })
-                                    res.quantity = (parseFloat(res.quantity) - parseFloat(itemDetailObj['item-quantity']) + parseFloat(preItemQuantity)).toFixed(3);
-                                    return modalStock.save(res);
-                                })
-                            );                        
-                    });
                     
-                    return Promise.all(p).then(res => {
-                        docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
-                        return super.save(docToSave);
-                    });
+                    
+                    return processStock(docToSave)
+                        .then(res => {
+                            docToSave.due_date = new Date(docToSave.due_date).getTime().toString();
+                            return super.save(docToSave);
+                        });
                 })
+
                 .catch(err => {
                     return super.save(docToSave);
+                });
+        }
+
+        function processStock(docToSave){
+            let itemDetailsProp = docToSave['item-details'];
+            let p = []
+            let modalStock = new Stock();
+            itemDetailsProp.forEach(itemDetailObj => {
+                console.log(itemDetailObj.item);
+                p.push(modalStock.get(itemDetailObj.item).then(res => { 
+                                               
+                            let preItemQuantity = 0;
+                            if(Object.keys(preDoc).length !=0){
+                                preDoc['item-details'].forEach(preDocItemDetailObj => {
+                                    preItemQuantity = (preDocItemDetailObj.item == itemDetailObj.item) ? preDocItemDetailObj['item-quantity'] : 0;
+                                })
+                            }
+                            res.quantity = (parseFloat(res.quantity) - parseFloat(itemDetailObj['item-quantity']) + parseFloat(preItemQuantity)).toFixed(3);
+                            return modalStock.save(res);
+                        })
+                    );                        
+            });
+
+            return Promise.all(p)
+                .then(res => {
+                    return res;
                 });
         }
     }

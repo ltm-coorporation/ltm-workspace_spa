@@ -69,8 +69,9 @@ class HTMLTable extends viewElements{
     }
 
     tableRowBuilder(rowDataObj, rowFields, index){
-        var tr = document.createElement('tr');
-        // var th = document.createElement('th');
+        
+        
+        var tr = document.createElement('tr');        
         var td = document.createElement('td');
         var btn = document.createElement('button');
     
